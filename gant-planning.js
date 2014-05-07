@@ -52,12 +52,11 @@ var Planning=function()
 			if (type=="text")
 				xleft-=d.x;
 
-			move="";
+			move="none";
 
 			if (Math.abs(xleft)<_this.params.border*_this.style.stepWidth)
 				{
-					console.log("west")
-					move="w";
+					move="left";
 				}
 
 			var xright=xleft-d.width;
@@ -65,7 +64,7 @@ var Planning=function()
 			console.log(xleft,xright);
 			if (Math.abs(xright)<_this.params.border*_this.style.stepWidth)
 				{
-					move="o";
+					move="right";
 				}
 		})
 		.on("drag", function(d,i) {
@@ -82,33 +81,37 @@ var Planning=function()
 				}
 
 		console.log(move)
-			if (move=="")
+			if (move=="none")
+			{
 				_this.mainElement.selectAll(".phase-"+i)
 					.attr("transform","translate("+[d.rx,0]+")");
-			if (move=="o")
+			}
+			if (move=="right")
+			{
 				_this.mainElement.selectAll(".phase-"+i)
 					.attr("width",function(v){return (v.width+d.rx)+"px"})
-			if (move=="w")
+			}
+			if (move=="left")
+			{
 				_this.mainElement.selectAll(".phase.phase-"+i)
 					.attr("x",function(v){return (v.x+d.rx)+"px"})
 					.attr("width",function(v){return (v.width-d.rx)+"px"})
+			}
 		})
 		.on("dragend",function(d,i)
 		{
 			for(i=0;i<_this.phases.length;i++) {
 				var phase=_this.phases[i];
-				if(move=="") {
+				if(move=="none") {
 					phase.x+=phase.dx;
 					var newStart=Math.round(timeToCoordinate.invert(phase.x));
 					phase.end=newStart+phase.end-phase.start
 					phase.start=newStart
 				}
-				if (move=="o") 
+				if (move=="right")
 					phase.end=Math.round(timeToCoordinate.invert(phase.x+phase.width+phase.dx))+2
-				if (move=="w") {
+				if (move=="left")
 					phase.start=Math.round(timeToCoordinate.invert(phase.x+phase.dx))
-					//phase.end=
-				}
 				phase.dx=0;
 			}
 			reorderPhases();
