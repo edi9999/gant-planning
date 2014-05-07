@@ -14,7 +14,10 @@
 <script>
 	var planning=gantplanning
 		.createPlanning()
-		.fill([{"description":"First Phase","start":1,"end":5}])
+		.fill([
+			{"description":"First Phase","start":1,"end":5},
+			{"description":"Second Phase","start":3,"end":6}
+		])
 		.attachTo(document.getElementById('demo'))
 		.draw();
 </script>
