@@ -44,7 +44,8 @@ var Planning=function()
 			var ev=_this.events[i];
 			ev.x=(ev.start-1)*_this.style.stepWidth;
 			ev.y=_this.style.phasesY+i*_this.style.phasesHeight;
-			console.log(ev);
+			ev.textx=(ev.start+ev.end-2)/2*_this.style.stepWidth;
+			ev.texty=_this.style.phasesY+17+i*_this.style.phasesHeight;
 			_this.events[i]=ev;
 		}
 	}
@@ -73,8 +74,8 @@ var Planning=function()
 		descriptions.enter()
 			.append("text")
 			.attr("class","description")
-			.attr("x",function(v,i){return (v.start+v.end-2)/2*_this.style.stepWidth+"px"})
-			.attr("y",function(v,i){return _this.style.phasesY+17+(i)*_this.style.phasesHeight+"px"})
+			.attr("x",function(v,i){return v.textx+"px"})
+			.attr("y",function(v,i){return v.texty+"px"})
 			.attr("fill",_this.style.textColor)
 			.attr("text-anchor","middle")
 			.attr("font-size",_this.style.fontsize)
