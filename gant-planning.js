@@ -33,9 +33,8 @@ var Planning=function()
 	var drag = d3.behavior.drag()
 		.on("drag", function(d,i) {
 			d.x+=d3.event.dx;
-			d3.select(this).attr("transform", function(d,i){
-			return "translate(" + [d.x,0] + ")"
-		})
+			console.log(this);
+			_this.mainElement.selectAll(".phase-"+i).attr("transform","translate("+[d.x,0]+")");
 	});
 
 	var calcCoordinates=function()
@@ -58,6 +57,7 @@ var Planning=function()
 		phases.enter()
 			.append("rect")
 			.attr("class","phase")
+			.attr("class",function(v,i){return "phase-"+i})
 			.attr("fill",_this.style.phasesColor)
 			.attr("height",_this.style.phasesHeight+"px")
 			.attr("width",function(v,i){return (v.end-v.start)*_this.style.stepWidth+"px"})
@@ -74,6 +74,7 @@ var Planning=function()
 		descriptions.enter()
 			.append("text")
 			.attr("class","description")
+			.attr("class",function(v,i){return "phase-"+i})
 			.attr("x",function(v,i){return v.textx+"px"})
 			.attr("y",function(v,i){return v.texty+"px"})
 			.attr("fill",_this.style.textColor)
