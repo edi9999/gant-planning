@@ -9,12 +9,16 @@ var Planning=function()
 
 	this.style={
 		phasesColor:d3.rgb("#083968"),
-		stepWidth:20,
-		phasesHeight:25,
+		stepWidth:40,
+		phasesHeight:35,
 		textColor:d3.rgb("#F7F7F7"),
 		phasesY:30,
 		fontsize:16
 	};
+
+	this.params={
+		sticky:0.4
+	}
 	
 	this.fill=function(phases)
 	{
@@ -37,8 +41,19 @@ var Planning=function()
 	var drag = d3.behavior.drag()
 		.on("drag", function(d,i) {
 			d.dx+=d3.event.dx;
+			//Sticky edges
+			var distance=Math.abs(Math.round(timeToCoordinate.invert(d.dx))-timeToCoordinate.invert(d.dx));
+			if (distance<_this.params.sticky)
+				{
+					d.rx= timeToCoordinate(Math.round(timeToCoordinate.invert(d.dx)));
+				}
+			else
+				{
+					d.rx=d.dx;
+				}
+
 			_this.mainElement.selectAll(".phase-"+i)
-				.attr("transform","translate("+[d.dx,0]+")");
+				.attr("transform","translate("+[d.rx,0]+")");
 		})
 		.on("dragend",function(d,i)
 		{
