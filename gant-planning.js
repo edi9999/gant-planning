@@ -88,6 +88,10 @@ var Planning=function()
 			if (move=="o")
 				_this.mainElement.selectAll(".phase-"+i)
 					.attr("width",function(v){return (v.width+d.rx)+"px"})
+			if (move=="w")
+				_this.mainElement.selectAll(".phase.phase-"+i)
+					.attr("x",function(v){return (v.x+d.rx)+"px"})
+					.attr("width",function(v){return (v.width-d.rx)+"px"})
 		})
 		.on("dragend",function(d,i)
 		{
@@ -99,11 +103,11 @@ var Planning=function()
 					phase.end=newStart+phase.end-phase.start
 					phase.start=newStart
 				}
-				if (move=="o") {
-					console.log(phase.end)
-					console.log(timeToCoordinate.invert(phase.x+phase.width+phase.dx))
+				if (move=="o") 
 					phase.end=Math.round(timeToCoordinate.invert(phase.x+phase.width+phase.dx))+2
-					console.log(phase.end)
+				if (move=="w") {
+					phase.start=Math.round(timeToCoordinate.invert(phase.x+phase.dx))
+					//phase.end=
 				}
 				phase.dx=0;
 			}
