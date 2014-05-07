@@ -1,6 +1,6 @@
 !function() {
 var gantplanning={
-	version:"0.0.1"
+	version:"0.1.0"
 };
 
 var Planning=function()
@@ -17,7 +17,8 @@ var Planning=function()
 	};
 
 	this.params={
-		sticky:0.4
+		sticky:0.4,
+		border:0.3
 	}
 	
 	this.fill=function(phases)
@@ -38,7 +39,35 @@ var Planning=function()
 		return this;
 	}
 
+	var move="";
+
 	var drag = d3.behavior.drag()
+		.on("dragstart", function(d,i) {
+			var type=d3.event.sourceEvent.srcElement.nodeName;
+
+			var xleft=d3.event.sourceEvent.offsetX;
+			console.log(type);
+			if (type=="rect")
+				xleft-=d.x;
+			if (type=="text")
+				xleft-=d.x;
+
+			move="";
+
+			if (Math.abs(xleft)<_this.params.border*_this.style.stepWidth)
+				{
+					console.log("west")
+					move="w";
+				}
+
+			var xright=xleft-d.width;
+
+			console.log(xleft,xright);
+			if (Math.abs(xright)<_this.params.border*_this.style.stepWidth)
+				{
+					move="o";
+				}
+		})
 		.on("drag", function(d,i) {
 			d.dx+=d3.event.dx;
 			//Sticky edges
@@ -52,17 +81,30 @@ var Planning=function()
 					d.rx=d.dx;
 				}
 
-			_this.mainElement.selectAll(".phase-"+i)
-				.attr("transform","translate("+[d.rx,0]+")");
+		console.log(move)
+			if (move=="")
+				_this.mainElement.selectAll(".phase-"+i)
+					.attr("transform","translate("+[d.rx,0]+")");
+			if (move=="o")
+				_this.mainElement.selectAll(".phase-"+i)
+					.attr("width",function(v){return (v.width+d.rx)+"px"})
 		})
 		.on("dragend",function(d,i)
 		{
 			for(i=0;i<_this.phases.length;i++) {
 				var phase=_this.phases[i];
-				phase.x+=phase.dx;
-				var newStart=Math.round(timeToCoordinate.invert(phase.x));
-				phase.end=newStart+phase.end-phase.start
-				phase.start=newStart
+				if(move=="") {
+					phase.x+=phase.dx;
+					var newStart=Math.round(timeToCoordinate.invert(phase.x));
+					phase.end=newStart+phase.end-phase.start
+					phase.start=newStart
+				}
+				if (move=="o") {
+					console.log(phase.end)
+					console.log(timeToCoordinate.invert(phase.x+phase.width+phase.dx))
+					phase.end=Math.round(timeToCoordinate.invert(phase.x+phase.width+phase.dx))+2
+					console.log(phase.end)
+				}
 				phase.dx=0;
 			}
 			reorderPhases();
@@ -91,7 +133,8 @@ var Planning=function()
 		for(i=0;i<_this.phases.length;i++) {
 			var phase=_this.phases[i];
 			phase.x=timeToCoordinate(phase.start);
-			phase.textx=timeToCoordinate((phase.start+phase.end)/2);
+			phase.textx=timeToCoordinate((phase.start+phase.end-2)/2);
+			phase.width=timeToCoordinate(phase.end-phase.start-1);
 			phase.y=_this.style.phasesY+i*_this.style.phasesHeight;
 			phase.texty=_this.style.phasesY+17+i*_this.style.phasesHeight;
 			_this.phases[i]=phase;
@@ -110,10 +153,10 @@ var Planning=function()
 			.attr("height",_this.style.phasesHeight+"px")
 
 		phases
-			.attr("width",function(v,i){return (v.end-v.start)*_this.style.stepWidth+"px"})
+			.attr("width",function(v){return v.width+"px"})
 			.attr("transform","translate("+[0,0]+")")
-			.attr("x",function(v,i){return v.x+"px"})
-			.attr("y",function(v,i){return v.y+"px"})
+			.attr("x",function(v){return v.x+"px"})
+			.attr("y",function(v){return v.y+"px"})
 			.call(drag);
 	}
 

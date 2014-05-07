@@ -5,3 +5,7 @@
 	height:400px;
 	padding:4px;
 }
+.gant-planning .description, .gant-planning .phase
+{
+	cursor:ew-resize;
+}
