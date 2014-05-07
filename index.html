@@ -3,9 +3,20 @@
 <head>
 	<meta charset="UTF-8">
 	<title></title>
+	<link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<svg id="demo"></svg>
 	
+<script src="bower_components/d3/d3.js"></script>
 <script src="gant-planning.js"></script>
+<script>
+	var planning=gantplanning
+		.createPlanning()
+		.fill([{"description":"First Phase","start":1,"end":5}])
+		.attachTo(document.getElementById('demo'))
+		.draw();
+</script>
 </body>
 </html>
