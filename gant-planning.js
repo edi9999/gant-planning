@@ -32,10 +32,9 @@ var Planning=function()
 
 	var drag = d3.behavior.drag()
 		.on("drag", function(d,i) {
-			console.log(d3.event.dx);
-			console.log(d3.event.dy);
+			d.x+=d3.event.dx;
 			d3.select(this).attr("transform", function(d,i){
-			return "translate(" + [d3.event.dx,d3.event.dy] + ")"
+			return "translate(" + [d.x,0] + ")"
 		})
 	});
 
