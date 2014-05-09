@@ -9,7 +9,7 @@ var Planning=function()
 
 	this.style={
 		phasesColor:d3.rgb("#083968"),
-		stepWidth:40,
+		stepWidth:100,
 		phasesHeight:35,
 		textColor:d3.rgb("#F7F7F7"),
 		phasesY:30,
@@ -17,7 +17,7 @@ var Planning=function()
 	};
 
 	this.params={
-		sticky:0.4,
+		sticky:0.2,
 		border:0.3
 	}
 	
@@ -70,17 +70,20 @@ var Planning=function()
 		.on("drag", function(d,i) {
 			d.dx+=d3.event.dx;
 			//Sticky edges
-			var distance=Math.abs(Math.round(timeToCoordinate.invert(d.dx))-timeToCoordinate.invert(d.dx));
+			var difference=Math.round(timeToCoordinate.invert(d.dx))-timeToCoordinate.invert(d.dx);
+			var distance=Math.abs(difference);
 			if (distance<_this.params.sticky)
 				{
-					d.rx= timeToCoordinate(Math.round(timeToCoordinate.invert(d.dx)));
+					if (difference*d3.event.dx<=0 )
+						d.rx=d.dx;
+					else
+						d.rx= timeToCoordinate(Math.round(timeToCoordinate.invert(d.dx)));
 				}
 			else
 				{
 					d.rx=d.dx;
 				}
 
-		console.log(move)
 			if (move=="none")
 			{
 				_this.mainElement.selectAll(".phase-"+i)
@@ -109,7 +112,7 @@ var Planning=function()
 					phase.start=newStart
 				}
 				if (move=="right")
-					phase.end=Math.round(timeToCoordinate.invert(phase.x+phase.width+phase.dx))+2
+					phase.end=Math.round(timeToCoordinate.invert(phase.x+phase.width+phase.dx))+1
 				if (move=="left")
 					phase.start=Math.round(timeToCoordinate.invert(phase.x+phase.dx))
 				phase.dx=0;
@@ -140,8 +143,8 @@ var Planning=function()
 		for(i=0;i<_this.phases.length;i++) {
 			var phase=_this.phases[i];
 			phase.x=timeToCoordinate(phase.start);
-			phase.textx=timeToCoordinate((phase.start+phase.end-2)/2);
-			phase.width=timeToCoordinate(phase.end-phase.start-1);
+			phase.textx=timeToCoordinate((phase.start+phase.end-1)/2);
+			phase.width=timeToCoordinate(phase.end-phase.start);
 			phase.y=_this.style.phasesY+i*_this.style.phasesHeight;
 			phase.texty=_this.style.phasesY+17+i*_this.style.phasesHeight;
 			_this.phases[i]=phase;
