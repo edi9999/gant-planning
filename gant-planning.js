@@ -17,18 +17,30 @@ var Planning=function()
 	};
 
 	this.params={
-		sticky:0.2,
+		sticky:0.1,
 		border:0.3
 	}
 	
+	var clean=function(phase)
+	{
+		phase.dx=0;
+		phase.dy=0;
+		return phase;
+	}
+
 	this.fill=function(phases)
 	{
 		this.phases=phases;
 		for(i=0;i<this.phases.length;i++){
-			this.phases[i].dx=0;
-			this.phases[i].dy=0;
+			this.phases[i]=clean(this.phases[i]);
 		}
 		return this;
+	}
+
+	this.addPhase=function(phase)
+	{
+		this.phases.push(clean(phase));
+		this.draw()
 	}
 
 	this.attachTo=function(element)
@@ -39,32 +51,29 @@ var Planning=function()
 		return this;
 	}
 
-	var move="";
+	var moveDirection="none";
 
 	var drag = d3.behavior.drag()
 		.on("dragstart", function(d,i) {
 			var type=d3.event.sourceEvent.srcElement.nodeName;
-
 			var xleft=d3.event.sourceEvent.offsetX;
-			console.log(type);
 			if (type=="rect")
 				xleft-=d.x;
 			if (type=="text")
 				xleft-=d.x;
 
-			move="none";
+			moveDirection="none";
 
 			if (Math.abs(xleft)<_this.params.border*_this.style.stepWidth)
 				{
-					move="left";
+					moveDirection="left";
 				}
 
 			var xright=xleft-d.width;
 
-			console.log(xleft,xright);
 			if (Math.abs(xright)<_this.params.border*_this.style.stepWidth)
 				{
-					move="right";
+					moveDirection="right";
 				}
 		})
 		.on("drag", function(d,i) {
@@ -74,27 +83,24 @@ var Planning=function()
 			var distance=Math.abs(difference);
 			if (distance<_this.params.sticky)
 				{
-					if (difference*d3.event.dx<=0 )
-						d.rx=d.dx;
-					else
-						d.rx= timeToCoordinate(Math.round(timeToCoordinate.invert(d.dx)));
+					d.rx= timeToCoordinate(Math.round(timeToCoordinate.invert(d.dx)));
 				}
 			else
 				{
 					d.rx=d.dx;
 				}
 
-			if (move=="none")
+			if (moveDirection=="none")
 			{
 				_this.mainElement.selectAll(".phase-"+i)
 					.attr("transform","translate("+[d.rx,0]+")");
 			}
-			if (move=="right")
+			if (moveDirection=="right")
 			{
 				_this.mainElement.selectAll(".phase-"+i)
 					.attr("width",function(v){return (v.width+d.rx)+"px"})
 			}
-			if (move=="left")
+			if (moveDirection=="left")
 			{
 				_this.mainElement.selectAll(".phase.phase-"+i)
 					.attr("x",function(v){return (v.x+d.rx)+"px"})
@@ -105,19 +111,18 @@ var Planning=function()
 		{
 			for(i=0;i<_this.phases.length;i++) {
 				var phase=_this.phases[i];
-				if(move=="none") {
+				if(moveDirection=="none") {
 					phase.x+=phase.dx;
 					var newStart=Math.round(timeToCoordinate.invert(phase.x));
 					phase.end=newStart+phase.end-phase.start
 					phase.start=newStart
 				}
-				if (move=="right")
+				if (moveDirection=="right")
 					phase.end=Math.round(timeToCoordinate.invert(phase.x+phase.width+phase.dx))+1
-				if (move=="left")
+				if (moveDirection=="left")
 					phase.start=Math.round(timeToCoordinate.invert(phase.x+phase.dx))
 				phase.dx=0;
 			}
-			reorderPhases();
 			_this.draw();
 		});
 
@@ -161,6 +166,7 @@ var Planning=function()
 			.attr("class",function(v,i){return "phase phase-"+i})
 			.attr("fill",_this.style.phasesColor)
 			.attr("height",_this.style.phasesHeight+"px")
+			.attr("y",function(v){return v.y+"px"})
 
 		phases
 			.attr("width",function(v){return v.width+"px"})
@@ -192,6 +198,7 @@ var Planning=function()
 
 	this.draw=function()
 	{
+		reorderPhases();
 		calcCoordinates();
 		updatePhases();
 		updateDescriptions();
