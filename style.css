@@ -9,3 +9,13 @@
 {
 	cursor:ew-resize;
 }
+
+.gant-planning .description.stretch-right, .gant-planning .phase.stretch-right
+{
+	cursor:e-resize;
+}
+
+.gant-planning .description.stretch-left, .gant-planning .phase.stretch-left
+{
+	cursor:w-resize;
+}

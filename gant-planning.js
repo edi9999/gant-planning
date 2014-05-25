@@ -22,7 +22,7 @@ var Planning=function()
 		border:0.3
 	}
 	
-	var clean=function(phase) {
+	var cleanPhase=function(phase) {
 		phase.dx=0;
 		phase.dy=0;
 		return phase;
@@ -31,13 +31,13 @@ var Planning=function()
 	this.fill=function(phases) {
 		this.phases=phases;
 		for(i=0;i<this.phases.length;i++){
-			this.phases[i]=clean(this.phases[i]);
+			this.phases[i]=cleanPhase(this.phases[i]);
 		}
 		return this;
 	}
 
 	this.addPhase=function(phase) {
-		this.phases.push(clean(phase));
+		this.phases.push(cleanPhase(phase));
 		this.draw()
 	}
 
@@ -48,7 +48,17 @@ var Planning=function()
 		return this;
 	}
 
-	var moveDirection="none";
+	var detectMoveDirection=function(xleft,width){
+		if (Math.abs(xleft)<_this.params.border*_this.style.stepWidth) {
+				return "left";
+			}
+		var xright=xleft-width;
+
+		if (Math.abs(xright)<_this.params.border*_this.style.stepWidth) {
+				return "right";
+			}
+		return "none";
+	}
 
 	var drag = d3.behavior.drag()
 		.on("dragstart", function(d,i) {
@@ -59,17 +69,7 @@ var Planning=function()
 			if (type=="text")
 				xleft-=d.x;
 
-			moveDirection="none";
-
-			if (Math.abs(xleft)<_this.params.border*_this.style.stepWidth) {
-					moveDirection="left";
-				}
-
-			var xright=xleft-d.width;
-
-			if (Math.abs(xright)<_this.params.border*_this.style.stepWidth) {
-					moveDirection="right";
-				}
+			moveDirection=detectMoveDirection(xleft,d.width)
 		})
 		.on("drag", function(d,i) {
 			d.dx+=d3.event.dx;
@@ -153,6 +153,11 @@ var Planning=function()
 			.attr("fill",_this.style.phasesColor)
 			.attr("height",_this.style.phasesHeight+"px")
 			.attr("y",function(v){return v.y+"px"})
+			/*
+			.on("mouseover",function(v,i){
+				d3.select(this).attr("class",function(v,i){return "phase phase-"+i+" stretch"})
+			})
+			*/
 
 		phases
 			.attr("width",function(v){return v.width+"px"})
