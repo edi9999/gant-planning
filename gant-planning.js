@@ -1,4 +1,5 @@
 !function() {
+
 var gantplanning={
 	version:"0.1.0"
 };
@@ -21,15 +22,13 @@ var Planning=function()
 		border:0.3
 	}
 	
-	var clean=function(phase)
-	{
+	var clean=function(phase) {
 		phase.dx=0;
 		phase.dy=0;
 		return phase;
 	}
 
-	this.fill=function(phases)
-	{
+	this.fill=function(phases) {
 		this.phases=phases;
 		for(i=0;i<this.phases.length;i++){
 			this.phases[i]=clean(this.phases[i]);
@@ -37,14 +36,12 @@ var Planning=function()
 		return this;
 	}
 
-	this.addPhase=function(phase)
-	{
+	this.addPhase=function(phase) {
 		this.phases.push(clean(phase));
 		this.draw()
 	}
 
-	this.attachTo=function(element)
-	{
+	this.attachTo=function(element) {
 		this.element=element;
 		this.mainElement= d3.select(this.element)
 			.attr("class","gant-planning");
@@ -64,15 +61,13 @@ var Planning=function()
 
 			moveDirection="none";
 
-			if (Math.abs(xleft)<_this.params.border*_this.style.stepWidth)
-				{
+			if (Math.abs(xleft)<_this.params.border*_this.style.stepWidth) {
 					moveDirection="left";
 				}
 
 			var xright=xleft-d.width;
 
-			if (Math.abs(xright)<_this.params.border*_this.style.stepWidth)
-				{
+			if (Math.abs(xright)<_this.params.border*_this.style.stepWidth) {
 					moveDirection="right";
 				}
 		})
@@ -81,34 +76,28 @@ var Planning=function()
 			//Sticky edges
 			var difference=Math.round(timeToCoordinate.invert(d.dx))-timeToCoordinate.invert(d.dx);
 			var distance=Math.abs(difference);
-			if (distance<_this.params.sticky)
-				{
+			if (distance<_this.params.sticky) {
 					d.rx= timeToCoordinate(Math.round(timeToCoordinate.invert(d.dx)));
 				}
-			else
-				{
+			else {
 					d.rx=d.dx;
 				}
 
-			if (moveDirection=="none")
-			{
+			if (moveDirection=="none") {
 				_this.mainElement.selectAll(".phase-"+i)
 					.attr("transform","translate("+[d.rx,0]+")");
 			}
-			if (moveDirection=="right")
-			{
+			if (moveDirection=="right") {
 				_this.mainElement.selectAll(".phase-"+i)
 					.attr("width",function(v){return (v.width+d.rx)+"px"})
 			}
-			if (moveDirection=="left")
-			{
+			if (moveDirection=="left") {
 				_this.mainElement.selectAll(".phase.phase-"+i)
 					.attr("x",function(v){return (v.x+d.rx)+"px"})
 					.attr("width",function(v){return (v.width-d.rx)+"px"})
 			}
 		})
-		.on("dragend",function(d,i)
-		{
+		.on("dragend",function(d,i) {
 			for(i=0;i<_this.phases.length;i++) {
 				var phase=_this.phases[i];
 				if(moveDirection=="none") {
@@ -126,8 +115,7 @@ var Planning=function()
 			_this.draw();
 		});
 
-	var reorderPhases=function()
-	{
+	var reorderPhases=function() {
 		_this.phases.sort(function(a,b){
 			var x = a.start+1/100*a.end; 
 			var y = b.start+1/100*b.end;
@@ -143,8 +131,7 @@ var Planning=function()
 		.domain([1,2])
 		.range([0,_this.style.stepWidth]);
 
-	var calcCoordinates=function()
-	{
+	var calcCoordinates=function() {
 		for(i=0;i<_this.phases.length;i++) {
 			var phase=_this.phases[i];
 			phase.x=timeToCoordinate(phase.start);
@@ -156,8 +143,7 @@ var Planning=function()
 		}
 	}
 
-	var updatePhases=function()
-	{
+	var updatePhases=function() {
 		var phases=_this.mainElement.selectAll("rect.phase")
 			.data(_this.phases);
 
@@ -176,8 +162,7 @@ var Planning=function()
 			.call(drag);
 	}
 
-	var updateDescriptions=function()
-	{
+	var updateDescriptions=function() {
 		var descriptions=_this.mainElement.selectAll("text.description")
 			.data(_this.phases);
 
@@ -196,8 +181,7 @@ var Planning=function()
 			.call(drag);
 	}
 
-	this.draw=function()
-	{
+	this.draw=function() {
 		reorderPhases();
 		calcCoordinates();
 		updatePhases();
@@ -208,8 +192,7 @@ var Planning=function()
 	this.phases=[];
 }
 
-gantplanning.createPlanning=function(planning)
-{
+gantplanning.createPlanning=function(planning) {
 	return new Planning();
 }
 
