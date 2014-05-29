@@ -68,7 +68,6 @@ var Planning=function()
 				xleft-=d.x;
 			if (type=="text")
 				xleft-=d.x;
-
 			moveDirection=detectMoveDirection(xleft,d.width)
 		})
 		.on("drag", function(d,i) {
@@ -153,11 +152,17 @@ var Planning=function()
 			.attr("fill",_this.style.phasesColor)
 			.attr("height",_this.style.phasesHeight+"px")
 			.attr("y",function(v){return v.y+"px"})
-			/*
-			.on("mouseover",function(v,i){
-				d3.select(this).attr("class",function(v,i){return "phase phase-"+i+" stretch"})
-			})
-			*/
+			.on("mousemove",function(d,i){
+				var type=d3.event.srcElement.nodeName;
+				var xleft=d3.event.offsetX;
+				if (type=="rect")
+					xleft-=d.x;
+				if (type=="text")
+					xleft-=d.x;
+				moveDirection=detectMoveDirection(xleft,d.width)
+				d3.select(this)
+					.attr("class",function(v){return "phase phase-"+i+" stretch-"+moveDirection})
+			});
 
 		phases
 			.attr("width",function(v){return v.width+"px"})
@@ -177,6 +182,17 @@ var Planning=function()
 			.attr("text-anchor","middle")
 			.attr("font-size",_this.style.fontsize)
 			.attr("fill",_this.style.textColor)
+			.on("mousemove",function(d,i){
+				var type=d3.event.srcElement.nodeName;
+				var xleft=d3.event.offsetX;
+				if (type=="rect")
+					xleft-=d.x;
+				if (type=="text")
+					xleft-=d.x;
+				moveDirection=detectMoveDirection(xleft,d.width)
+				d3.select(this)
+					.attr("class",function(v){return "description phase-"+i+" stretch-"+moveDirection})
+			});
 
 		descriptions
 			.attr("transform","translate("+[0,0]+")")
