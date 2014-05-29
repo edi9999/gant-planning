@@ -8,14 +8,14 @@ var Planning=function()
 {
 	var currentMoveDirection=undefined;
 	var _this=this;
-
+	var timeToCoordinate;
 
 	this.style={
-		phasesColor:d3.rgb("#083968"),
+		phaseColor:d3.rgb("#083968"),
 		stepWidth:100,
-		phasesHeight:35,
+		phaseHeight:35,
 		textColor:d3.rgb("#F7F7F7"),
-		phasesY:30,
+		phaseY:30,
 		fontsize:16
 	};
 
@@ -24,9 +24,18 @@ var Planning=function()
 		border:0.3
 	}
 
-	var timeToCoordinate = d3.scale.linear()
-		.domain([0,1])
-		.range([0,this.style.stepWidth]);
+	var calcTimeToCoordinate=function()
+	{
+		timeToCoordinate = d3.scale.linear()
+			.domain([0,1])
+			.range([0,_this.style.stepWidth]);
+	}
+
+	this.setStepWidth=function(stepWidth)
+	{
+		this.style.stepWidth=stepWidth;
+		calcTimeToCoordinate();
+	}
 	
 	var cleanPhase=function(phase) {
 		phase.dx=0;
@@ -104,6 +113,11 @@ var Planning=function()
 					.attr("x",function(v){return (v.textx+d.rx/2)+"px"})
 			}
 			if (currentMoveDirection=="left") {
+				console.log(d.end-d.start-timeToCoordinate.invert(d.rx))
+				if (d.end-d.start-timeToCoordinate.invert(d.rx)<=1) {
+					console.log("stop");
+					d.rx=timeToCoordinate(d.end-d.start-1);
+				}
 				_this.mainElement.selectAll(".description.phase-"+i)
 					.attr("x",function(v){return (v.textx+d.rx/2)+"px"})
 				_this.mainElement.selectAll(".phase.phase-"+i)
@@ -120,10 +134,14 @@ var Planning=function()
 					phase.end=newStart+phase.end-phase.start
 					phase.start=newStart
 				}
-				if (currentMoveDirection=="right")
+				if (currentMoveDirection=="right") {
 					phase.end=Math.round(timeToCoordinate.invert(phase.x+phase.width+phase.dx))
-				if (currentMoveDirection=="left")
+					if (phase.end<phase.start+1) phase.end=phase.start+1;
+				}
+				if (currentMoveDirection=="left") {
 					phase.start=Math.round(timeToCoordinate.invert(phase.x+phase.dx))
+					if (phase.start>phase.end-1) phase.start=phase.end-1;
+				}
 				phase.dx=0;
 			}
 			_this.draw();
@@ -149,8 +167,8 @@ var Planning=function()
 			phase.x=timeToCoordinate(phase.start);
 			phase.textx=timeToCoordinate((phase.start+phase.end)/2);
 			phase.width=timeToCoordinate(phase.end-phase.start);
-			phase.y=_this.style.phasesY+i*_this.style.phasesHeight;
-			phase.texty=_this.style.phasesY+17+i*_this.style.phasesHeight;
+			phase.y=_this.style.phaseY+i*_this.style.phaseHeight;
+			phase.texty=_this.style.phaseY+17+i*_this.style.phaseHeight;
 			_this.phases[i]=phase;
 		}
 	}
@@ -162,8 +180,8 @@ var Planning=function()
 		phases.enter()
 			.append("rect")
 			.attr("class",function(v,i){return "phase phase-"+i})
-			.attr("fill",_this.style.phasesColor)
-			.attr("height",_this.style.phasesHeight+"px")
+			.attr("fill",_this.style.phaseColor)
+			.attr("height",_this.style.phaseHeight+"px")
 			.attr("y",function(v){return v.y+"px"})
 			.on("mousemove",function(d,i){
 				var type=d3.event.srcElement.nodeName;
@@ -224,6 +242,7 @@ var Planning=function()
 	}
 
 	this.phases=[];
+	calcTimeToCoordinate();
 }
 
 gantplanning.createPlanning=function(planning) {
