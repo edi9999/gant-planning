@@ -83,17 +83,23 @@ var Planning=function()
 					d.rx=d.dx;
 				}
 			if (currentMoveDirection=="none") {
-				_this.mainElement.selectAll(".phase-"+i)
-					.attr("transform","translate("+[d.rx,0]+")");
+				_this.mainElement.selectAll(".phase.phase-"+i)
+					.attr("x",function(v){return (v.x+d.rx)})
+				_this.mainElement.selectAll(".description.phase-"+i)
+					.attr("x",function(v){return (v.textx+d.rx)})
 			}
 			if (currentMoveDirection=="right") {
-				if (d.end-d.start+timeToCoordinate.invert(d.rx)<=3) {
-					d.rx=timeToCoordinate(d.start-d.end+3);
+				if (d.end-d.start+timeToCoordinate.invert(d.rx)<=1) {
+					d.rx=timeToCoordinate(d.start-d.end+1);
 				}
-				_this.mainElement.selectAll(".phase-"+i)
+				_this.mainElement.selectAll(".phase.phase-"+i)
 					.attr("width",function(v){return (v.width+d.rx)+"px"})
+				_this.mainElement.selectAll(".description.phase-"+i)
+					.attr("x",function(v){return (v.textx+d.rx/2)+"px"})
 			}
 			if (currentMoveDirection=="left") {
+				_this.mainElement.selectAll(".description.phase-"+i)
+					.attr("x",function(v){return (v.textx+d.rx/2)+"px"})
 				_this.mainElement.selectAll(".phase.phase-"+i)
 					.attr("x",function(v){return (v.x+d.rx)+"px"})
 					.attr("width",function(v){return (v.width-d.rx)+"px"})
