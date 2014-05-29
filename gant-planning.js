@@ -159,7 +159,7 @@ var Planning=function()
 					xleft-=d.x;
 				if (type=="text")
 					xleft-=d.x;
-				moveDirection=detectMoveDirection(xleft,d.width)
+				var moveDirection=detectMoveDirection(xleft,d.width)
 				d3.select(this)
 					.attr("class",function(v){return "phase phase-"+i+" stretch-"+moveDirection})
 			});
@@ -189,7 +189,7 @@ var Planning=function()
 					xleft-=d.x;
 				if (type=="text")
 					xleft-=d.x;
-				moveDirection=detectMoveDirection(xleft,d.width)
+				var moveDirection=detectMoveDirection(xleft,d.width)
 				d3.select(this)
 					.attr("class",function(v){return "description phase-"+i+" stretch-"+moveDirection})
 			});
