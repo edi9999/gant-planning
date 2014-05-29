@@ -88,6 +88,7 @@ var Planning=function()
 		})
 		.on("drag", function(d,i) {
 			d.dx+=d3.event.dx;
+
 			//Sticky edges
 			var difference=Math.round(timeToCoordinate.invert(d.dx))-timeToCoordinate.invert(d.dx);
 			var distance=Math.abs(difference);
@@ -97,12 +98,16 @@ var Planning=function()
 			else {
 					d.rx=d.dx;
 				}
+
 			if (currentMoveDirection=="none") {
+				if(d.start+timeToCoordinate.invert(d.rx)<=0)
+					d.rx=-timeToCoordinate(d.start);
 				_this.mainElement.selectAll(".phase.phase-"+i)
 					.attr("x",function(v){return (v.x+d.rx)})
 				_this.mainElement.selectAll(".description.phase-"+i)
 					.attr("x",function(v){return (v.textx+d.rx)})
 			}
+
 			if (currentMoveDirection=="right") {
 				if (d.end-d.start+timeToCoordinate.invert(d.rx)<=1) {
 					d.rx=timeToCoordinate(d.start-d.end+1);
@@ -113,9 +118,7 @@ var Planning=function()
 					.attr("x",function(v){return (v.textx+d.rx/2)+"px"})
 			}
 			if (currentMoveDirection=="left") {
-				console.log(d.end-d.start-timeToCoordinate.invert(d.rx))
 				if (d.end-d.start-timeToCoordinate.invert(d.rx)<=1) {
-					console.log("stop");
 					d.rx=timeToCoordinate(d.end-d.start-1);
 				}
 				_this.mainElement.selectAll(".description.phase-"+i)
@@ -128,21 +131,28 @@ var Planning=function()
 		.on("dragend",function(d,i) {
 			for(i=0;i<_this.phases.length;i++) {
 				var phase=_this.phases[i];
-				if(currentMoveDirection=="none") {
-					phase.x+=phase.dx;
-					var newStart=Math.round(timeToCoordinate.invert(phase.x));
-					phase.end=newStart+phase.end-phase.start
-					phase.start=newStart
-				}
-				if (currentMoveDirection=="right") {
-					phase.end=Math.round(timeToCoordinate.invert(phase.x+phase.width+phase.dx))
-					if (phase.end<phase.start+1) phase.end=phase.start+1;
-				}
-				if (currentMoveDirection=="left") {
-					phase.start=Math.round(timeToCoordinate.invert(phase.x+phase.dx))
-					if (phase.start>phase.end-1) phase.start=phase.end-1;
+				if (phase.dx!=0)
+				{
+					if(currentMoveDirection=="none") {
+						phase.x+=phase.rx;
+						var newStart=Math.round(timeToCoordinate.invert(phase.x));
+						phase.end=newStart+phase.end-phase.start;
+						phase.start=newStart;
+						currentMoveDirection=undefined;
+					}
+					if (currentMoveDirection=="right") {
+						phase.end=Math.round(timeToCoordinate.invert(phase.x+phase.width+phase.rx));
+						if (phase.end<phase.start+1) phase.end=phase.start+1;
+						currentMoveDirection=undefined;
+					}
+					if (currentMoveDirection=="left") {
+						phase.start=Math.round(timeToCoordinate.invert(phase.x+phase.rx));
+						if (phase.start>phase.end-1) phase.start=phase.end-1;
+						currentMoveDirection=undefined;
+					}
 				}
 				phase.dx=0;
+				phase.rx=0;
 			}
 			_this.draw();
 			currentMoveDirection=undefined;
