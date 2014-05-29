@@ -82,8 +82,6 @@ var Planning=function()
 			else {
 					d.rx=d.dx;
 				}
-
-
 			if (currentMoveDirection=="none") {
 				_this.mainElement.selectAll(".phase-"+i)
 					.attr("transform","translate("+[d.rx,0]+")");
@@ -111,7 +109,7 @@ var Planning=function()
 					phase.start=newStart
 				}
 				if (currentMoveDirection=="right")
-					phase.end=Math.round(timeToCoordinate.invert(phase.x+phase.width+phase.dx))+1
+					phase.end=Math.round(timeToCoordinate.invert(phase.x+phase.width+phase.dx))
 				if (currentMoveDirection=="left")
 					phase.start=Math.round(timeToCoordinate.invert(phase.x+phase.dx))
 				phase.dx=0;
@@ -133,14 +131,14 @@ var Planning=function()
 	}
 
 	var timeToCoordinate = d3.scale.linear()
-		.domain([1,2])
+		.domain([0,1])
 		.range([0,_this.style.stepWidth]);
 
 	var calcCoordinates=function() {
 		for(i=0;i<_this.phases.length;i++) {
 			var phase=_this.phases[i];
 			phase.x=timeToCoordinate(phase.start);
-			phase.textx=timeToCoordinate((phase.start+phase.end-1)/2);
+			phase.textx=timeToCoordinate((phase.start+phase.end)/2);
 			phase.width=timeToCoordinate(phase.end-phase.start);
 			phase.y=_this.style.phasesY+i*_this.style.phasesHeight;
 			phase.texty=_this.style.phasesY+17+i*_this.style.phasesHeight;
