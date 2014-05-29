@@ -16,7 +16,8 @@ var Planning=function()
 		phaseHeight:35,
 		textColor:d3.rgb("#F7F7F7"),
 		phaseY:30,
-		fontsize:16
+		fontsize:16,
+		offsetTextY:21
 	};
 
 	this.params={
@@ -178,7 +179,7 @@ var Planning=function()
 			phase.textx=timeToCoordinate((phase.start+phase.end)/2);
 			phase.width=timeToCoordinate(phase.end-phase.start);
 			phase.y=_this.style.phaseY+i*_this.style.phaseHeight;
-			phase.texty=_this.style.phaseY+17+i*_this.style.phaseHeight;
+			phase.texty=_this.style.phaseY+_this.style.offsetTextY+i*_this.style.phaseHeight;
 			_this.phases[i]=phase;
 		}
 	}
