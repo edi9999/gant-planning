@@ -6,6 +6,7 @@ var gantplanning={
 
 var Planning=function()
 {
+	var currentMoveDirection=undefined;
 	_this=this;
 
 	this.style={
@@ -82,11 +83,15 @@ var Planning=function()
 					d.rx=d.dx;
 				}
 
+
 			if (currentMoveDirection=="none") {
 				_this.mainElement.selectAll(".phase-"+i)
 					.attr("transform","translate("+[d.rx,0]+")");
 			}
 			if (currentMoveDirection=="right") {
+				if (d.end-d.start+timeToCoordinate.invert(d.rx)<=3) {
+					d.rx=timeToCoordinate(d.start-d.end+3);
+				}
 				_this.mainElement.selectAll(".phase-"+i)
 					.attr("width",function(v){return (v.width+d.rx)+"px"})
 			}
