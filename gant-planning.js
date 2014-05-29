@@ -68,7 +68,7 @@ var Planning=function()
 				xleft-=d.x;
 			if (type=="text")
 				xleft-=d.x;
-			moveDirection=detectMoveDirection(xleft,d.width)
+			currentMoveDirection=detectMoveDirection(xleft,d.width)
 		})
 		.on("drag", function(d,i) {
 			d.dx+=d3.event.dx;
@@ -82,15 +82,15 @@ var Planning=function()
 					d.rx=d.dx;
 				}
 
-			if (moveDirection=="none") {
+			if (currentMoveDirection=="none") {
 				_this.mainElement.selectAll(".phase-"+i)
 					.attr("transform","translate("+[d.rx,0]+")");
 			}
-			if (moveDirection=="right") {
+			if (currentMoveDirection=="right") {
 				_this.mainElement.selectAll(".phase-"+i)
 					.attr("width",function(v){return (v.width+d.rx)+"px"})
 			}
-			if (moveDirection=="left") {
+			if (currentMoveDirection=="left") {
 				_this.mainElement.selectAll(".phase.phase-"+i)
 					.attr("x",function(v){return (v.x+d.rx)+"px"})
 					.attr("width",function(v){return (v.width-d.rx)+"px"})
@@ -99,19 +99,20 @@ var Planning=function()
 		.on("dragend",function(d,i) {
 			for(i=0;i<_this.phases.length;i++) {
 				var phase=_this.phases[i];
-				if(moveDirection=="none") {
+				if(currentMoveDirection=="none") {
 					phase.x+=phase.dx;
 					var newStart=Math.round(timeToCoordinate.invert(phase.x));
 					phase.end=newStart+phase.end-phase.start
 					phase.start=newStart
 				}
-				if (moveDirection=="right")
+				if (currentMoveDirection=="right")
 					phase.end=Math.round(timeToCoordinate.invert(phase.x+phase.width+phase.dx))+1
-				if (moveDirection=="left")
+				if (currentMoveDirection=="left")
 					phase.start=Math.round(timeToCoordinate.invert(phase.x+phase.dx))
 				phase.dx=0;
 			}
 			_this.draw();
+			currentMoveDirection=undefined;
 		});
 
 	var reorderPhases=function() {
@@ -159,7 +160,10 @@ var Planning=function()
 					xleft-=d.x;
 				if (type=="text")
 					xleft-=d.x;
-				var moveDirection=detectMoveDirection(xleft,d.width)
+				if (currentMoveDirection==undefined)
+					var moveDirection=detectMoveDirection(xleft,d.width)
+				else
+					var moveDirection=currentMoveDirection;
 				d3.select(this)
 					.attr("class",function(v){return "phase phase-"+i+" stretch-"+moveDirection})
 			});
@@ -189,7 +193,10 @@ var Planning=function()
 					xleft-=d.x;
 				if (type=="text")
 					xleft-=d.x;
-				var moveDirection=detectMoveDirection(xleft,d.width)
+				if (currentMoveDirection==undefined)
+					var moveDirection=detectMoveDirection(xleft,d.width)
+				else
+					var moveDirection=currentMoveDirection;
 				d3.select(this)
 					.attr("class",function(v){return "description phase-"+i+" stretch-"+moveDirection})
 			});
