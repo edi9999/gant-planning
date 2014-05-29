@@ -108,7 +108,7 @@ var Planning=function()
 					d.rx=-timeToCoordinate(d.start);
 				_this.mainElement.selectAll(".phase.phase-"+i)
 					.attr("x",function(v){return (v.x+d.rx)})
-				_this.mainElement.selectAll(".description.phase-"+i)
+				_this.mainElement.selectAll(".phase-description.phase-"+i)
 					.attr("x",function(v){return (v.textx+d.rx)})
 			}
 
@@ -118,14 +118,14 @@ var Planning=function()
 				}
 				_this.mainElement.selectAll(".phase.phase-"+i)
 					.attr("width",function(v){return (v.width+d.rx)+"px"})
-				_this.mainElement.selectAll(".description.phase-"+i)
+				_this.mainElement.selectAll(".phase-description.phase-"+i)
 					.attr("x",function(v){return (v.textx+d.rx/2)+"px"})
 			}
 			if (currentMoveDirection=="left") {
 				if (d.end-d.start-timeToCoordinate.invert(d.rx)<=1) {
 					d.rx=timeToCoordinate(d.end-d.start-1);
 				}
-				_this.mainElement.selectAll(".description.phase-"+i)
+				_this.mainElement.selectAll(".phase-description.phase-"+i)
 					.attr("x",function(v){return (v.textx+d.rx/2)+"px"})
 				_this.mainElement.selectAll(".phase.phase-"+i)
 					.attr("x",function(v){return (v.x+d.rx)+"px"})
@@ -221,12 +221,13 @@ var Planning=function()
 	}
 
 	var updateDescriptions=function() {
-		var descriptions=_this.mainElement.selectAll("text.description")
+		console.log(_this.phases)
+		var descriptions=_this.mainElement.selectAll("text.phase-description")
 			.data(_this.phases);
 
 		descriptions.enter()
 			.append("text")
-			.attr("class",function(v,i){return "description phase-"+i})
+			.attr("class",function(v,i){return "phase-description phase-"+i})
 			.attr("text-anchor","middle")
 			.attr("font-size",_this.style.fontsize)
 			.attr("fill",_this.style.textColor)
@@ -236,7 +237,7 @@ var Planning=function()
 				else
 					var moveDirection=currentMoveDirection;
 				d3.select(this)
-					.attr("class",function(v){return "description phase-"+i+" stretch-"+moveDirection})
+					.attr("class",function(v){return "phase-description phase-"+i+" stretch-"+moveDirection})
 			});
 
 		descriptions
@@ -252,11 +253,11 @@ var Planning=function()
 		var weeks=Array.apply(null, {length: n}).map(Number.call, Number);
 		var weeksForBars=Array.apply(null, {length: n+1}).map(Number.call, Number);
 
-		var weekDescriptions=_this.mainElement.selectAll("text.week.description")
+		var weekDescriptions=_this.mainElement.selectAll("text.week-description")
 			.data(weeks);
 
 		weekDescriptions.enter().append("text")
-			.attr("class","week description");
+			.attr("class","week-description");
 
 		weekDescriptions
 			.attr("text-anchor","middle")
