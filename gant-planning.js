@@ -7,7 +7,8 @@ var gantplanning={
 var Planning=function()
 {
 	var currentMoveDirection=undefined;
-	_this=this;
+	var _this=this;
+
 
 	this.style={
 		phasesColor:d3.rgb("#083968"),
@@ -22,6 +23,10 @@ var Planning=function()
 		sticky:0.1,
 		border:0.3
 	}
+
+	var timeToCoordinate = d3.scale.linear()
+		.domain([0,1])
+		.range([0,this.style.stepWidth]);
 	
 	var cleanPhase=function(phase) {
 		phase.dx=0;
@@ -49,6 +54,7 @@ var Planning=function()
 		return this;
 	}
 
+
 	var detectMoveDirection=function(xleft,width){
 		if (Math.abs(xleft)<_this.params.border*_this.style.stepWidth) {
 				return "left";
@@ -65,11 +71,11 @@ var Planning=function()
 		.on("dragstart", function(d,i) {
 			var type=d3.event.sourceEvent.srcElement.nodeName;
 			var xleft=d3.event.sourceEvent.offsetX;
-			if (type=="rect")
-				xleft-=d.x;
+			xleft-=d.x;
 			if (type=="text")
-				xleft-=d.x;
-			currentMoveDirection=detectMoveDirection(xleft,d.width)
+				currentMoveDirection="none";
+			else
+				currentMoveDirection=detectMoveDirection(xleft,d.width);
 		})
 		.on("drag", function(d,i) {
 			d.dx+=d3.event.dx;
@@ -136,9 +142,6 @@ var Planning=function()
 		});
 	}
 
-	var timeToCoordinate = d3.scale.linear()
-		.domain([0,1])
-		.range([0,_this.style.stepWidth]);
 
 	var calcCoordinates=function() {
 		for(i=0;i<_this.phases.length;i++) {
@@ -196,14 +199,8 @@ var Planning=function()
 			.attr("font-size",_this.style.fontsize)
 			.attr("fill",_this.style.textColor)
 			.on("mousemove",function(d,i){
-				var type=d3.event.srcElement.nodeName;
-				var xleft=d3.event.offsetX;
-				if (type=="rect")
-					xleft-=d.x;
-				if (type=="text")
-					xleft-=d.x;
 				if (currentMoveDirection==undefined)
-					var moveDirection=detectMoveDirection(xleft,d.width)
+					var moveDirection="none";
 				else
 					var moveDirection=currentMoveDirection;
 				d3.select(this)
