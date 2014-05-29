@@ -17,12 +17,16 @@ var Planning=function()
 		textColor:d3.rgb("#F7F7F7"),
 		phaseY:30,
 		fontsize:16,
-		offsetTextY:21
+		offsetTextY:21,
+		weekColor:d3.rgb("#083968"),
+		weekBarColor:d3.rgb("#999999")
 	};
 
 	this.params={
 		sticky:0.1,
-		border:0.3
+		border:0.3,
+		week:"Semaine",
+		showWeeks:true
 	}
 
 	var calcTimeToCoordinate=function()
@@ -63,7 +67,6 @@ var Planning=function()
 			.attr("class","gant-planning");
 		return this;
 	}
-
 
 	var detectMoveDirection=function(xleft,width){
 		if (Math.abs(xleft)<_this.params.border*_this.style.stepWidth) {
@@ -244,11 +247,48 @@ var Planning=function()
 			.call(drag);
 	}
 
+	var drawWeeks=function(n)
+	{
+		var weeks=Array.apply(null, {length: n}).map(Number.call, Number);
+		var weeksForBars=Array.apply(null, {length: n+1}).map(Number.call, Number);
+
+		var weekDescriptions=_this.mainElement.selectAll("text.week.description")
+			.data(weeks);
+
+		weekDescriptions.enter().append("text")
+			.attr("class","week description");
+
+		weekDescriptions
+			.attr("text-anchor","middle")
+			.attr("font-size",_this.style.fontsize)
+			.attr("fill",_this.style.weekColor)
+			.attr("x",function(w){return timeToCoordinate(w+0.5);})
+			.attr("y",17)
+			.text(function(d){return _this.params.week+" "+(d+1)});
+
+		var weekBars=_this.mainElement.selectAll("rect.week.bars")
+			.data(weeksForBars);
+
+		weekBars.enter().append("rect")
+			.attr("class","week bars");
+
+		weekBars
+			.attr("width",2)
+			.attr("height",12)
+			.attr("y",12)
+			.attr("x",function(w){return timeToCoordinate(w);})
+			.attr("fill",_this.style.weekBarColor);
+
+		weekBars.exit().remove();
+	}
+
 	this.draw=function() {
 		reorderPhases();
 		calcCoordinates();
 		updatePhases();
 		updateDescriptions();
+		if (this.params.showWeeks==true)
+			drawWeeks(7);
 		return this;
 	}
 
