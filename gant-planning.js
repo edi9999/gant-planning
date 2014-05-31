@@ -26,9 +26,9 @@ var Planning=function()
 
 	this.params={
 		sticky:0.1,
-		minWeeks:6,
+		minWeeks:4,
 		border:0.3,
-		week:"Semaine",
+		week:"S",
 		showWeeks:true
 	}
 
@@ -44,36 +44,10 @@ var Planning=function()
 				.range([0,_this.style.stepWidth]);
 	}
 
-	this.setStepWidth=function(stepWidth)
-	{
-		this.style.stepWidth=stepWidth;
-		calcTimeToCoordinate();
-	}
-	
 	var cleanPhase=function(phase) {
 		phase.dx=0;
 		phase.dy=0;
 		return phase;
-	}
-
-	this.fill=function(phases) {
-		this.phases=phases;
-		for(i=0;i<this.phases.length;i++){
-			this.phases[i]=cleanPhase(this.phases[i]);
-		}
-		return this;
-	}
-
-	this.addPhase=function(phase) {
-		this.phases.push(cleanPhase(phase));
-		this.draw()
-	}
-
-	this.attachTo=function(element) {
-		this.element=element;
-		this.mainElement= d3.select(this.element)
-			.attr("class","gant-planning");
-		return this;
 	}
 
 	var detectMoveDirection=function(xleft,width){
@@ -88,14 +62,14 @@ var Planning=function()
 		return "none";
 	}
 
-	var calcMaxWeek=function(phases)
+	var getMaxWeek=function()
 	{
-		var max=phases[0].end;
-		phases.forEach(function(phase){
+		var max=_this.phases[0].end;
+		_this.phases.forEach(function(phase){
 			max=Math.max(max,phase.end);
 		});
 		return max;
-	}
+	};
 
 	var drag = d3.behavior.drag()
 		.on("dragstart", function(d,i) {
@@ -181,6 +155,8 @@ var Planning=function()
 				phase.dx=0;
 				phase.rx=0;
 			}
+			_this.setWeeks(getMaxWeek());
+			_this.drawWeeks();
 			_this.draw();
 			currentMoveDirection=undefined;
 		});
@@ -195,8 +171,7 @@ var Planning=function()
 			if (a.description>b.description) return 1;
 			return -1;
 		});
-	}
-
+	};
 
 	var calcCoordinates=function() {
 		for(i=0;i<_this.phases.length;i++) {
@@ -269,10 +244,37 @@ var Planning=function()
 			.call(drag)
 	}
 
+	this.setStepWidth=function(stepWidth)
+	{
+		this.style.stepWidth=stepWidth;
+		calcTimeToCoordinate();
+	}
+	
+	this.fill=function(phases) {
+		this.phases=phases;
+		for(i=0;i<this.phases.length;i++){
+			this.phases[i]=cleanPhase(this.phases[i]);
+		}
+		return this;
+	}
+
+	this.addPhase=function(phase) {
+		this.phases.push(cleanPhase(phase));
+		this.draw()
+	}
+
+	this.attachTo=function(element) {
+		this.element=element;
+		this.mainElement= d3.select(this.element)
+			.attr("class","gant-planning");
+		return this;
+	}
+
 	this.setWeeks=function(n)
 	{
 		if (n===undefined) n=0;
 		this.weeks=Math.max(n,this.params.minWeeks);
+		calcTimeToCoordinate();
 	}
 
 	this.drawWeeks=function()
@@ -290,15 +292,17 @@ var Planning=function()
 			.attr("text-anchor","middle")
 			.attr("font-size",_this.style.fontsize)
 			.attr("fill",_this.style.weekColor)
-			.attr("x",function(w){return timeToCoordinate(w+0.5);})
 			.attr("y",17)
+			.attr("x",function(w){return timeToCoordinate(w+0.5);})
 			.text(function(d){return _this.params.week+" "+(d+1)});
 
-		var weekBars=_this.mainElement.selectAll("rect.week.bars")
+		weekDescriptions.exit().remove();
+
+		var weekBars=_this.mainElement.selectAll("rect.week-bars")
 			.data(weeksForBars);
 
 		weekBars.enter().append("rect")
-			.attr("class","week bars");
+			.attr("class","week-bars");
 
 		weekBars
 			.attr("width",2)
@@ -313,7 +317,7 @@ var Planning=function()
 	this.draw=function() {
 		reorderPhases();
 		if (this.params.showWeeks==true) {
-			this.setWeeks()
+			this.setWeeks(getMaxWeek())
 		}
 		calcTimeToCoordinate();
 		if (this.params.showWeeks==true) {
