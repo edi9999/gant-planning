@@ -1,13 +1,17 @@
 gant-planning
 =============
 
-D3js based planning editor
+D3js based planning editor. 
+
+Features:
+
+ * Drag and drop to move/resize phases
+ * Click to edit a phase description
+
 
 # [Demo Page](http://javascript-ninja.fr/planning/)
 
 ![Demo Image](demo.png)
-
-
 
 ### HTML:
 
