@@ -9,6 +9,7 @@ var Planning=function()
 	var currentMoveDirection=undefined;
 	var _this=this;
 	var timeToCoordinate;
+	var dragged;
 
 	this.style={
 		phaseColor:d3.rgb("#083968"),
@@ -69,7 +70,6 @@ var Planning=function()
 	}
 
 	var detectMoveDirection=function(xleft,width){
-		console.log("detect",xleft,width)
 		if (Math.abs(xleft)<_this.params.border*_this.style.stepWidth) {
 				return "left";
 			}
@@ -83,7 +83,6 @@ var Planning=function()
 
 	var drag = d3.behavior.drag()
 		.on("dragstart", function(d,i) {
-			console.log(d3.event);
 			var type=d3.event.sourceEvent.target.nodeName;
 			var xleft = d3.event.sourceEvent.offsetX==undefined?d3.event.sourceEvent.layerX:d3.event.sourceEvent.offsetX;
 			xleft-=d.x;
@@ -91,8 +90,10 @@ var Planning=function()
 				currentMoveDirection="none";
 			else
 				currentMoveDirection=detectMoveDirection(xleft,d.width);
+			dragged=false;
 		})
 		.on("drag", function(d,i) {
+			dragged=true;
 			d.dx+=d3.event.dx;
 
 			//Sticky edges
@@ -135,6 +136,10 @@ var Planning=function()
 			}
 		})
 		.on("dragend",function(d,i) {
+			if (dragged==false)
+			{
+				return true;
+			}
 			for(i=0;i<_this.phases.length;i++) {
 				var phase=_this.phases[i];
 				if (phase.dx!=0)
@@ -216,7 +221,6 @@ var Planning=function()
 
 		phases
 			.attr("width",function(v){return v.width+"px"})
-			.attr("transform","translate("+[0,0]+")")
 			.attr("x",function(v){return v.x+"px"})
 			.attr("y",function(v){return v.y+"px"})
 			.call(drag);
@@ -242,15 +246,11 @@ var Planning=function()
 			});
 
 		descriptions
-			.attr("transform","translate("+[0,0]+")")
 			.attr("x",function(v,i){return v.textx+"px"})
 			.attr("y",function(v,i){return v.texty+"px"})
 			.text(function(d){return d.description})
+			.on("click",function(){ if (dragged==false) alert('edit'); })
 			.call(drag)
-			.on("click",function(){
-				console.log(d3.event);
-				alert('edit')
-			});
 	}
 
 	var drawWeeks=function(n)
@@ -298,6 +298,7 @@ var Planning=function()
 		return this;
 	}
 
+	dragged=false;
 	this.phases=[];
 	calcTimeToCoordinate();
 }

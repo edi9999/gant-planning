@@ -1,0 +1,24 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+Planning	gant-planning.js	/^var Planning=function()$/;"	c
+Planning.Planning.addPhase.attachTo	gant-planning.js	/^	this.attachTo=function(element) {$/;"	m
+Planning.Planning.addPhase.calcCoordinates	gant-planning.js	/^	var calcCoordinates=function() {$/;"	m
+Planning.Planning.addPhase.detectMoveDirection	gant-planning.js	/^	var detectMoveDirection=function(xleft,width){$/;"	m
+Planning.Planning.addPhase.draw	gant-planning.js	/^	this.draw=function() {$/;"	m
+Planning.Planning.addPhase.drawWeeks	gant-planning.js	/^	var drawWeeks=function(n)$/;"	m
+Planning.Planning.addPhase.reorderPhases	gant-planning.js	/^	var reorderPhases=function() {$/;"	m
+Planning.Planning.addPhase.updateDescriptions	gant-planning.js	/^	var updateDescriptions=function() {$/;"	m
+Planning.Planning.addPhase.updatePhases	gant-planning.js	/^	var updatePhases=function() {$/;"	m
+Planning.addPhase	gant-planning.js	/^	this.addPhase=function(phase) {$/;"	m
+Planning.calcTimeToCoordinate	gant-planning.js	/^	var calcTimeToCoordinate=function()$/;"	m
+Planning.cleanPhase	gant-planning.js	/^	var cleanPhase=function(phase) {$/;"	m
+Planning.fill	gant-planning.js	/^	this.fill=function(phases) {$/;"	m
+Planning.params.sticky	gant-planning.js	/^	this.params={$/;"	p
+Planning.setStepWidth	gant-planning.js	/^	this.setStepWidth=function(stepWidth)$/;"	m
+Planning.style.phaseColor	gant-planning.js	/^	this.style={$/;"	p
+gantplanning	gant-planning.js	/^}$/;"	m
+version	gant-planning.js	/^var gantplanning={$/;"	p
