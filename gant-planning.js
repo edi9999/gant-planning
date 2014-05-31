@@ -13,10 +13,11 @@ var Planning=function()
 
 	this.style={
 		phaseColor:d3.rgb("#083968"),
-		stepWidth:100,
+		stepWidth:"auto",
 		phaseHeight:35,
 		textColor:d3.rgb("#F7F7F7"),
 		phaseY:30,
+		svgWidth:700,
 		fontsize:16,
 		offsetTextY:21,
 		weekColor:d3.rgb("#083968"),
@@ -25,6 +26,7 @@ var Planning=function()
 
 	this.params={
 		sticky:0.1,
+		minWeeks:6,
 		border:0.3,
 		week:"Semaine",
 		showWeeks:true
@@ -32,9 +34,14 @@ var Planning=function()
 
 	var calcTimeToCoordinate=function()
 	{
-		timeToCoordinate = d3.scale.linear()
-			.domain([0,1])
-			.range([0,_this.style.stepWidth]);
+		if (_this.style.stepWidth=="auto")
+			timeToCoordinate=d3.scale.linear()
+				.domain([0,_this.weeks])
+				.range([0,_this.style.svgWidth])
+		else
+			timeToCoordinate = d3.scale.linear()
+				.domain([0,1])
+				.range([0,_this.style.stepWidth]);
 	}
 
 	this.setStepWidth=function(stepWidth)
@@ -253,10 +260,16 @@ var Planning=function()
 			.call(drag)
 	}
 
-	var drawWeeks=function(n)
+	this.setWeeks=function(n)
 	{
-		var weeks=Array.apply(null, {length: n}).map(Number.call, Number);
-		var weeksForBars=Array.apply(null, {length: n+1}).map(Number.call, Number);
+		if (n===undefined) n=0;
+		this.weeks=Math.max(n,this.params.minWeeks);
+	}
+
+	this.drawWeeks=function()
+	{
+		var weeks=Array.apply(null, {length: _this.weeks}).map(Number.call, Number);
+		var weeksForBars=Array.apply(null, {length: _this.weeks+1}).map(Number.call, Number);
 
 		var weekDescriptions=_this.mainElement.selectAll("text.week-description")
 			.data(weeks);
@@ -290,17 +303,21 @@ var Planning=function()
 
 	this.draw=function() {
 		reorderPhases();
+		if (this.params.showWeeks==true) {
+			this.setWeeks()
+		}
+		calcTimeToCoordinate();
+		if (this.params.showWeeks==true) {
+			this.drawWeeks();
+		}
 		calcCoordinates();
 		updatePhases();
 		updateDescriptions();
-		if (this.params.showWeeks==true)
-			drawWeeks(7);
 		return this;
 	}
 
 	dragged=false;
 	this.phases=[];
-	calcTimeToCoordinate();
 }
 
 gantplanning.createPlanning=function(planning) {
