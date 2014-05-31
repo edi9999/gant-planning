@@ -69,6 +69,7 @@ var Planning=function()
 	}
 
 	var detectMoveDirection=function(xleft,width){
+		console.log("detect",xleft,width)
 		if (Math.abs(xleft)<_this.params.border*_this.style.stepWidth) {
 				return "left";
 			}
@@ -82,8 +83,9 @@ var Planning=function()
 
 	var drag = d3.behavior.drag()
 		.on("dragstart", function(d,i) {
-			var type=d3.event.sourceEvent.srcElement.nodeName;
-			var xleft=d3.event.sourceEvent.offsetX;
+			console.log(d3.event);
+			var type=d3.event.sourceEvent.target.nodeName;
+			var xleft = d3.event.sourceEvent.offsetX==undefined?d3.event.sourceEvent.layerX:d3.event.sourceEvent.offsetX;
 			xleft-=d.x;
 			if (type=="text")
 				currentMoveDirection="none";
@@ -198,8 +200,8 @@ var Planning=function()
 			.attr("height",_this.style.phaseHeight+"px")
 			.attr("y",function(v){return v.y+"px"})
 			.on("mousemove",function(d,i){
-				var type=d3.event.srcElement.nodeName;
-				var xleft=d3.event.offsetX;
+				var type=d3.event.target.nodeName;
+				var xleft = d3.event.offsetX==undefined?d3.event.layerX:d3.event.offsetX;
 				if (type=="rect")
 					xleft-=d.x;
 				if (type=="text")
@@ -221,7 +223,6 @@ var Planning=function()
 	}
 
 	var updateDescriptions=function() {
-		console.log(_this.phases)
 		var descriptions=_this.mainElement.selectAll("text.phase-description")
 			.data(_this.phases);
 
@@ -245,7 +246,11 @@ var Planning=function()
 			.attr("x",function(v,i){return v.textx+"px"})
 			.attr("y",function(v,i){return v.texty+"px"})
 			.text(function(d){return d.description})
-			.call(drag);
+			.call(drag)
+			.on("click",function(){
+				console.log(d3.event);
+				alert('edit')
+			});
 	}
 
 	var drawWeeks=function(n)
