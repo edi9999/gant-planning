@@ -77,15 +77,24 @@ var Planning=function()
 	}
 
 	var detectMoveDirection=function(xleft,width){
-		if (Math.abs(xleft)<_this.params.border*_this.style.stepWidth) {
+		if (Math.abs(xleft)<_this.params.border*timeToCoordinate(1)) {
 				return "left";
 			}
 		var xright=xleft-width;
 
-		if (Math.abs(xright)<_this.params.border*_this.style.stepWidth) {
+		if (Math.abs(xright)<_this.params.border*timeToCoordinate(1)) {
 				return "right";
 			}
 		return "none";
+	}
+
+	var calcMaxWeek=function(phases)
+	{
+		var max=phases[0].end;
+		phases.forEach(function(phase){
+			max=Math.max(max,phase.end);
+		});
+		return max;
 	}
 
 	var drag = d3.behavior.drag()
