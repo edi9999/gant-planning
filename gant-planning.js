@@ -29,6 +29,7 @@ var Planning=function()
 		minWeeks:4,
 		border:0.3,
 		week:"S",
+		getPhase:"What should the name of this phase be ?",
 		showWeeks:true
 	}
 
@@ -163,7 +164,7 @@ var Planning=function()
 
 	var reorderPhases=function() {
 		_this.phases.sort(function(a,b){
-			var x = a.start+1/100*a.end; 
+			var x = a.start+1/100*a.end;
 			var y = b.start+1/100*b.end;
 			if (x<y) return -1;
 			if (x>y) return 1;
@@ -240,7 +241,13 @@ var Planning=function()
 			.attr("x",function(v,i){return v.textx+"px"})
 			.attr("y",function(v,i){return v.texty+"px"})
 			.text(function(d){return d.description})
-			.on("click",function(){ if (dragged==false) alert('edit'); })
+			.on("click",function(d){
+				if (dragged) return;
+				var newValue=prompt(_this.params.getPhase,d.description)
+				if (!newValue) return;
+				d.description=newValue;
+				updateDescriptions()
+			})
 			.call(drag)
 	}
 
@@ -249,7 +256,7 @@ var Planning=function()
 		this.style.stepWidth=stepWidth;
 		calcTimeToCoordinate();
 	}
-	
+
 	this.fill=function(phases) {
 		this.phases=phases;
 		for(i=0;i<this.phases.length;i++){
