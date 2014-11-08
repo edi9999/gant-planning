@@ -4,12 +4,15 @@ var gantplanning={
 	version:"0.1.0"
 };
 
-var Planning=function()
+var Planning=function(modeArg)
 {
 	var currentMoveDirection=undefined;
 	var _this=this;
 	var timeToCoordinate;
 	var dragged;
+	if (typeof modeArg==="undefined")
+		modeArg="planning"
+	var mode=modeArg;
 
 	this.style={
 		phaseColor:d3.rgb("#083968"),
@@ -177,13 +180,26 @@ var Planning=function()
 	var calcCoordinates=function() {
 		for(i=0;i<_this.phases.length;i++) {
 			var phase=_this.phases[i];
-			phase.x=timeToCoordinate(phase.start);
-			phase.textx=timeToCoordinate((phase.start+phase.end)/2);
-			phase.width=timeToCoordinate(phase.end-phase.start);
 			phase.y=_this.style.phaseY+i*_this.style.phaseHeight;
 			phase.texty=_this.style.phaseY+_this.style.offsetTextY+i*_this.style.phaseHeight;
+			if (mode==='planning') phase=calcCoordinatesPhasePlanningMode(phase);
+			if (mode==='budget') phase=calcCoordinatesPhaseBudgetMode(phase);
 			_this.phases[i]=phase;
 		}
+	}
+
+	var calcCoordinatesPhasePlanningMode=function(phase) {
+		phase.x=timeToCoordinate(phase.start);
+		phase.textx=timeToCoordinate((phase.start+phase.end)/2);
+		phase.width=timeToCoordinate(phase.end-phase.start);
+		return phase;
+	}
+
+	var calcCoordinatesPhaseBudgetMode=function(phase) {
+		phase.x=0;
+		phase.textx=timeToCoordinate(1);
+		phase.width=timeToCoordinate(2);
+		return phase;
 	}
 
 	var updatePhases=function() {
@@ -270,6 +286,12 @@ var Planning=function()
 		this.draw()
 	}
 
+	this.setMode=function(m){
+		if (m!=='budget' && m!=='planning') return;
+		mode=m;
+		return this;
+	}
+
 	this.attachTo=function(element) {
 		this.element=element;
 		this.mainElement= d3.select(this.element)
@@ -284,11 +306,8 @@ var Planning=function()
 		calcTimeToCoordinate();
 	}
 
-	this.drawWeeks=function()
-	{
+	var drawWeekDescriptions=function(){
 		var weeks=Array.apply(null, {length: _this.weeks}).map(Number.call, Number);
-		var weeksForBars=Array.apply(null, {length: _this.weeks+1}).map(Number.call, Number);
-
 		var weekDescriptions=_this.mainElement.selectAll("text.week-description")
 			.data(weeks);
 
@@ -304,6 +323,10 @@ var Planning=function()
 			.text(function(d){return _this.params.week+" "+(d+1)});
 
 		weekDescriptions.exit().remove();
+	}
+
+	var drawWeekBars=function(){
+		var weeksForBars=Array.apply(null, {length: _this.weeks+1}).map(Number.call, Number);
 
 		var weekBars=_this.mainElement.selectAll("rect.week-bars")
 			.data(weeksForBars);
@@ -321,14 +344,30 @@ var Planning=function()
 		weekBars.exit().remove();
 	}
 
+	this.drawWeeks=function()
+	{
+		drawWeekBars();
+		drawWeekDescriptions();
+	}
+
+	this.clearWeeks=function(){
+		_this.mainElement.selectAll("text.week-description").remove()
+	};
+
 	this.draw=function() {
 		reorderPhases();
 		if (this.params.showWeeks==true) {
-			this.setWeeks(getMaxWeek())
+			if (mode=='planning')
+				this.setWeeks(getMaxWeek());
+			if (mode=='budget')
+				this.setWeeks(2);
 		}
 		calcTimeToCoordinate();
 		if (this.params.showWeeks==true) {
-			this.drawWeeks();
+			if (mode=='planning')
+				this.drawWeeks();
+			if (mode=='budget')
+				this.clearWeeks();
 		}
 		calcCoordinates();
 		updatePhases();
