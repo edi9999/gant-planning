@@ -13,6 +13,11 @@ var Planning=function(modeArg)
 	if (typeof modeArg==="undefined")
 		modeArg="planning"
 	var mode=modeArg;
+	var idCount=0;
+
+	var idGetter=function(p){
+		return p.__id;
+	};
 
 	this.style={
 		phaseColor:d3.rgb("#083968"),
@@ -33,7 +38,8 @@ var Planning=function(modeArg)
 		border:0.3,
 		week:"S",
 		getPhase:"What should the name of this phase be ?",
-		showWeeks:true
+		showWeeks:true,
+		durationTime:200
 	}
 
 	var calcTimeToCoordinate=function()
@@ -51,6 +57,7 @@ var Planning=function(modeArg)
 	var cleanPhase=function(phase) {
 		phase.dx=0;
 		phase.dy=0;
+		phase.__id=idCount++;
 		return phase;
 	}
 
@@ -77,6 +84,7 @@ var Planning=function(modeArg)
 
 	var drag = d3.behavior.drag()
 		.on("dragstart", function(d,i) {
+			if (mode!='planning') return;
 			var type=d3.event.sourceEvent.target.nodeName;
 			var xleft = d3.event.sourceEvent.offsetX==undefined?d3.event.sourceEvent.layerX:d3.event.sourceEvent.offsetX;
 			xleft-=d.x;
@@ -87,6 +95,7 @@ var Planning=function(modeArg)
 			dragged=false;
 		})
 		.on("drag", function(d,i) {
+			if (mode!='planning') return;
 			dragged=true;
 			d.dx+=d3.event.dx;
 
@@ -130,6 +139,7 @@ var Planning=function(modeArg)
 			}
 		})
 		.on("dragend",function(d,i) {
+			if (mode!='planning') return;
 			if (dragged==false)
 			{
 				return true;
@@ -202,15 +212,22 @@ var Planning=function(modeArg)
 		return phase;
 	}
 
+	var getPhases=function(){
+		return _this
+			.mainElement
+			.selectAll("rect.phase");
+	}
+
 	var updatePhases=function() {
-		var phases=_this.mainElement.selectAll("rect.phase")
-			.data(_this.phases);
+		var phases=getPhases()
+			.data(_this.phases,idGetter);
 
 		phases.enter()
 			.append("rect")
 			.attr("class",function(v,i){return "phase phase-"+i})
 			.attr("fill",_this.style.phaseColor)
 			.attr("height",_this.style.phaseHeight+"px")
+			.attr("x",function(v){return v.x+"px"})
 			.attr("y",function(v){return v.y+"px"})
 			.on("mousemove",function(d,i){
 				var type=d3.event.target.nodeName;
@@ -228,15 +245,23 @@ var Planning=function(modeArg)
 			});
 
 		phases
+			.call(drag)
+
+		phases
+			.transition()
+			.duration(_this.params.durationTime)
 			.attr("width",function(v){return v.width+"px"})
 			.attr("x",function(v){return v.x+"px"})
 			.attr("y",function(v){return v.y+"px"})
-			.call(drag);
+	}
+
+	var getPhasesDescriptions=function(){
+		return _this.mainElement.selectAll("text.phase-description");
 	}
 
 	var updateDescriptions=function() {
-		var descriptions=_this.mainElement.selectAll("text.phase-description")
-			.data(_this.phases);
+		var descriptions=getPhasesDescriptions()
+			.data(_this.phases,idGetter);
 
 		descriptions.enter()
 			.append("text")
@@ -244,6 +269,8 @@ var Planning=function(modeArg)
 			.attr("text-anchor","middle")
 			.attr("font-size",_this.style.fontsize)
 			.attr("fill",_this.style.textColor)
+			.attr("x",function(v,i){return v.textx+"px"})
+			.attr("y",function(v,i){return v.texty+"px"})
 			.on("mousemove",function(d,i){
 				if (currentMoveDirection==undefined)
 					var moveDirection="none";
@@ -254,8 +281,6 @@ var Planning=function(modeArg)
 			});
 
 		descriptions
-			.attr("x",function(v,i){return v.textx+"px"})
-			.attr("y",function(v,i){return v.texty+"px"})
 			.text(function(d){return d.description})
 			.on("click",function(d){
 				if (dragged) return;
@@ -265,10 +290,13 @@ var Planning=function(modeArg)
 				updateDescriptions()
 			})
 			.call(drag)
+
+		descriptions.transition().duration(_this.params.durationTime)
+			.attr("x",function(v,i){return v.textx+"px"})
+			.attr("y",function(v,i){return v.texty+"px"})
 	}
 
-	this.setStepWidth=function(stepWidth)
-	{
+	this.setStepWidth=function(stepWidth) {
 		this.style.stepWidth=stepWidth;
 		calcTimeToCoordinate();
 	}
@@ -289,6 +317,7 @@ var Planning=function(modeArg)
 	this.setMode=function(m){
 		if (m!=='budget' && m!=='planning') return;
 		mode=m;
+		this.draw();
 		return this;
 	}
 
@@ -306,9 +335,16 @@ var Planning=function(modeArg)
 		calcTimeToCoordinate();
 	}
 
+	var getWeekDescriptions=function(){
+		return _this.mainElement.selectAll("text.week-description");
+	}
+	var getWeekBars=function(){
+		return _this.mainElement.selectAll("rect.week-bars");
+	}
+
 	var drawWeekDescriptions=function(){
 		var weeks=Array.apply(null, {length: _this.weeks}).map(Number.call, Number);
-		var weekDescriptions=_this.mainElement.selectAll("text.week-description")
+		var weekDescriptions=getWeekDescriptions()
 			.data(weeks);
 
 		weekDescriptions.enter().append("text")
@@ -328,7 +364,7 @@ var Planning=function(modeArg)
 	var drawWeekBars=function(){
 		var weeksForBars=Array.apply(null, {length: _this.weeks+1}).map(Number.call, Number);
 
-		var weekBars=_this.mainElement.selectAll("rect.week-bars")
+		var weekBars=getWeekBars()
 			.data(weeksForBars);
 
 		weekBars.enter().append("rect")
@@ -351,10 +387,17 @@ var Planning=function(modeArg)
 	}
 
 	this.clearWeeks=function(){
-		_this.mainElement.selectAll("text.week-description").remove()
+		getWeekBars().remove();
+		getWeekDescriptions().remove();
 	};
 
+	var addModeClass=function(){
+		_this.mainElement
+			.attr("class","gant-planning "+"mode-"+mode);
+	}
+
 	this.draw=function() {
+		addModeClass();
 		reorderPhases();
 		if (this.params.showWeeks==true) {
 			if (mode=='planning')

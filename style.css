@@ -5,20 +5,21 @@
 	height:400px;
 	padding:4px;
 }
-.gant-planning .description, .gant-planning .phase
+.gant-planning.mode-planning .description, .gant-planning.mode-planning .phase
 {
 	cursor:ew-resize;
 }
 
-.gant-planning .description.stretch-right, .gant-planning .phase.stretch-right
+.gant-planning.mode-planning .description.stretch-right, .gant-planning.mode-planning .phase.stretch-right
 {
 	cursor:e-resize;
 }
 
-.gant-planning .description.stretch-left, .gant-planning .phase.stretch-left
+.gant-planning.mode-planning .description.stretch-left, .gant-planning.mode-planning .phase.stretch-left
 {
 	cursor:w-resize;
 }
+
 .description
 {
 -moz-user-select: none; 
