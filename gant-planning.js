@@ -14,6 +14,7 @@ var Planning=function(modeArg)
 		modeArg="planning"
 	var mode=modeArg;
 	var idCount=0;
+	var selectedPhase=null;
 
 	var idGetter=function(p){
 		return p.__id;
@@ -21,6 +22,7 @@ var Planning=function(modeArg)
 
 	this.style={
 		phaseColor:d3.rgb("#083968"),
+		phaseSelectedColor:d3.rgb("#333"),
 		stepWidth:"auto",
 		phaseHeight:35,
 		textColor:d3.rgb("#F7F7F7"),
@@ -169,6 +171,7 @@ var Planning=function(modeArg)
 				phase.dx=0;
 				phase.rx=0;
 			}
+			_this.selectPhase(d.__id);
 			_this.setWeeks(getMaxWeek());
 			_this.drawWeeks();
 			_this.draw();
@@ -218,14 +221,13 @@ var Planning=function(modeArg)
 			.selectAll("rect.phase");
 	}
 
-	var updatePhases=function() {
+	var drawPhases=function() {
 		var phases=getPhases()
 			.data(_this.phases,idGetter);
 
 		phases.enter()
 			.append("rect")
 			.attr("class",function(v,i){return "phase phase-"+v.__id})
-			.attr("fill",_this.style.phaseColor)
 			.attr("height",_this.style.phaseHeight+"px")
 			.attr("x",function(v){return v.x+"px"})
 			.attr("y",function(v){return v.y+"px"})
@@ -245,6 +247,15 @@ var Planning=function(modeArg)
 			});
 
 		phases
+			.attr("fill",function(v){
+				if (v.__id===selectedPhase) return _this.style.phaseSelectedColor;
+				return _this.style.phaseColor;
+			})
+			.on("click",function(d){
+				d3.event.stopPropagation()
+				if (dragged) return;
+				_this.selectPhase(d.__id)
+			})
 			.call(drag)
 
 		phases
@@ -259,7 +270,7 @@ var Planning=function(modeArg)
 		return _this.mainElement.selectAll("text.phase-description");
 	}
 
-	var updateDescriptions=function() {
+	var drawDescriptions=function() {
 		var descriptions=getPhasesDescriptions()
 			.data(_this.phases,idGetter);
 
@@ -283,17 +294,20 @@ var Planning=function(modeArg)
 		descriptions
 			.text(function(d){return d.description})
 			.on("click",function(d){
+				d3.event.stopPropagation()
 				if (dragged) return;
-				var newValue=prompt(_this.params.getPhase,d.description)
-				if (!newValue) return;
-				d.description=newValue;
-				updateDescriptions()
+				_this.selectPhase(d.__id)
 			})
 			.call(drag)
 
 		descriptions.transition().duration(_this.params.durationTime)
 			.attr("x",function(v,i){return v.textx+"px"})
 			.attr("y",function(v,i){return v.texty+"px"})
+	}
+
+	this.selectPhase=function(id){
+		selectedPhase=id;
+		this.draw();
 	}
 
 	this.setStepWidth=function(stepWidth) {
@@ -311,7 +325,7 @@ var Planning=function(modeArg)
 
 	this.addPhase=function(phase) {
 		this.phases.push(cleanPhase(phase));
-		this.draw()
+		this.selectPhase(phase.__id)
 	}
 
 	this.setMode=function(m){
@@ -325,6 +339,10 @@ var Planning=function(modeArg)
 		this.element=element;
 		this.mainElement= d3.select(this.element)
 			.attr("class","gant-planning");
+
+		this.mainElement.on('click',function () {
+			_this.selectPhase(null);
+		})
 		return this;
 	}
 
@@ -413,8 +431,8 @@ var Planning=function(modeArg)
 				this.clearWeeks();
 		}
 		calcCoordinates();
-		updatePhases();
-		updateDescriptions();
+		drawPhases();
+		drawDescriptions();
 		return this;
 	}
 
