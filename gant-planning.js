@@ -112,9 +112,9 @@ var Planning=function(modeArg)
 			if (currentMoveDirection=="none") {
 				if(d.start+timeToCoordinate.invert(d.rx)<=0)
 					d.rx=-timeToCoordinate(d.start);
-				_this.mainElement.selectAll(".phase.phase-"+i)
+				_this.mainElement.selectAll(".phase.phase-"+d.__id)
 					.attr("x",function(v){return (v.x+d.rx)})
-				_this.mainElement.selectAll(".phase-description.phase-"+i)
+				_this.mainElement.selectAll(".phase-description.phase-"+d.__id)
 					.attr("x",function(v){return (v.textx+d.rx)})
 			}
 
@@ -122,18 +122,18 @@ var Planning=function(modeArg)
 				if (d.end-d.start+timeToCoordinate.invert(d.rx)<=1) {
 					d.rx=timeToCoordinate(d.start-d.end+1);
 				}
-				_this.mainElement.selectAll(".phase.phase-"+i)
+				_this.mainElement.selectAll(".phase.phase-"+d.__id)
 					.attr("width",function(v){return (v.width+d.rx)+"px"})
-				_this.mainElement.selectAll(".phase-description.phase-"+i)
+				_this.mainElement.selectAll(".phase-description.phase-"+d.__id)
 					.attr("x",function(v){return (v.textx+d.rx/2)+"px"})
 			}
 			if (currentMoveDirection=="left") {
 				if (d.end-d.start-timeToCoordinate.invert(d.rx)<=1) {
 					d.rx=timeToCoordinate(d.end-d.start-1);
 				}
-				_this.mainElement.selectAll(".phase-description.phase-"+i)
+				_this.mainElement.selectAll(".phase-description.phase-"+d.__id)
 					.attr("x",function(v){return (v.textx+d.rx/2)+"px"})
-				_this.mainElement.selectAll(".phase.phase-"+i)
+				_this.mainElement.selectAll(".phase.phase-"+d.__id)
 					.attr("x",function(v){return (v.x+d.rx)+"px"})
 					.attr("width",function(v){return (v.width-d.rx)+"px"})
 			}
@@ -224,7 +224,7 @@ var Planning=function(modeArg)
 
 		phases.enter()
 			.append("rect")
-			.attr("class",function(v,i){return "phase phase-"+i})
+			.attr("class",function(v,i){return "phase phase-"+v.__id})
 			.attr("fill",_this.style.phaseColor)
 			.attr("height",_this.style.phaseHeight+"px")
 			.attr("x",function(v){return v.x+"px"})
@@ -241,7 +241,7 @@ var Planning=function(modeArg)
 				else
 					var moveDirection=currentMoveDirection;
 				d3.select(this)
-					.attr("class",function(v){return "phase phase-"+i+" stretch-"+moveDirection})
+					.attr("class",function(v){return "phase phase-"+v.__id+" stretch-"+moveDirection})
 			});
 
 		phases
@@ -265,7 +265,7 @@ var Planning=function(modeArg)
 
 		descriptions.enter()
 			.append("text")
-			.attr("class",function(v,i){return "phase-description phase-"+i})
+			.attr("class",function(v,i){return "phase-description phase-"+v.__id})
 			.attr("text-anchor","middle")
 			.attr("font-size",_this.style.fontsize)
 			.attr("fill",_this.style.textColor)
@@ -277,7 +277,7 @@ var Planning=function(modeArg)
 				else
 					var moveDirection=currentMoveDirection;
 				d3.select(this)
-					.attr("class",function(v){return "phase-description phase-"+i+" stretch-"+moveDirection})
+					.attr("class",function(v){return "phase-description phase-"+v.__id+" stretch-"+moveDirection})
 			});
 
 		descriptions
