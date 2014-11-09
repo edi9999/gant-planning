@@ -1,7 +1,7 @@
 !function(){
 
 var gantplanning={
-	version:"0.2.0"
+	version:"0.2.1"
 };
 
 var Planning=function(modeArg)
@@ -458,7 +458,6 @@ var Planning=function(modeArg)
 		if (found!==false)
 			this.phases.splice(found,1)
 		this.phases.push(cleanPhase(phase));
-		this.selectPhase(phase)
 	}
 
 	this.removePhase=function(phase) {
@@ -467,7 +466,7 @@ var Planning=function(modeArg)
 			if(p.__id===phase.__id)
 				found=i;
 		})
-		if (found){
+		if (found!==false){
 			this.phases.splice(found,1);
 		}
 		this.draw();
