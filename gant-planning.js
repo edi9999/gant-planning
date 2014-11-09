@@ -1,7 +1,7 @@
 !function() {
 
 var gantplanning={
-	version:"0.1.3"
+	version:"0.1.4"
 };
 
 var Planning=function(modeArg)
@@ -82,7 +82,7 @@ var Planning=function(modeArg)
 	};
 
 	var getMaxWeek=function() {
-		var max=_this.phases[0].end;
+		var max=0;
 		_this.phases.forEach(function(phase){
 			max=Math.max(max,phase.end);
 		});
