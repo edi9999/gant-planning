@@ -1,7 +1,7 @@
 !function(){
 
 var gantplanning={
-	version:"0.1.5"
+	version:"0.1.6"
 };
 
 var Planning=function(modeArg)
@@ -46,6 +46,7 @@ var Planning=function(modeArg)
 		showWeeks:true,
 		attributes:{
 			'start':'start',
+			'description':'description',
 			'end':'end',
 			'price':'price',
 			'count':'count'
@@ -58,7 +59,7 @@ var Planning=function(modeArg)
 	var getX=function(v){return v.x+"px"};
 	var getY=function(v){return v.y+"px"};
 	var getWidth=function(v){return v.width+"px"};
-	var getDescription=function(v){return v.description};
+	var getDescription=function(v){return getAttr(v,'description')};
 	var idGetter=function(p){return p.__id;};
 	var onClickPhase=function(d){
 		d3.event.stopPropagation()
@@ -202,9 +203,10 @@ var Planning=function(modeArg)
 			var y = getAttr(b,'start')+1/100*getAttr(b,'end');
 			if (x<y) return -1;
 			if (x>y) return 1;
-			if (a.description<b.description) return -1;
-			if (a.description>b.description) return 1;
-			return -1;
+			if (getAttr(a,'description')<getAttr(b,'description')) return -1;
+			if (getAttr(a,'description')>getAttr(b,'description')) return 1;
+			if (a.__id<b.__id) return -1;
+			return 1;
 		});
 	};
 
@@ -217,6 +219,13 @@ var Planning=function(modeArg)
 			if (mode==='budget') phase=calcCoordinatesPhaseBudgetMode(phase);
 			_this.phases[i]=phase;
 		}
+	}
+
+	var resizeTotalHeight=function(){
+		_this.mainElement
+			.transition()
+			.duration(_this.params.durationTime)
+			.attr("height",_this.phases.length*_this.style.phaseHeight+_this.style.phaseY)
 	}
 
 	var calcCoordinatesPhasePlanningMode=function(phase) {
@@ -497,6 +506,7 @@ var Planning=function(modeArg)
 	}
 
 	this.draw=function() {
+		resizeTotalHeight();
 		addModeClass();
 		reorderPhases();
 		if (this.params.showWeeks) {
