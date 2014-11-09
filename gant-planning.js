@@ -38,6 +38,12 @@ var Planning=function(modeArg)
 		return this;
 	}
 
+	var getFill=function(v){
+		if (selectedPhase===null) return _this.style.phaseColor;
+		if (v.__id===selectedPhase.__id) return _this.style.phaseSelectedColor;
+		return _this.style.phaseColor;
+	}
+
 	var trigger=function (eventName,data) {
 		if (typeof eventListeners[eventName]==="undefined")
 			return;
@@ -288,10 +294,7 @@ var Planning=function(modeArg)
 			.attr("width",timeToCoordinate(2))
 
 		phases
-			.attr("fill",function(v){
-				if (v.__id===selectedPhase) return _this.style.phaseSelectedColor;
-				return _this.style.phaseColor;
-			})
+			.attr("fill",getFill)
 			.on("click",onClickPhase)
 
 		phases
@@ -362,10 +365,7 @@ var Planning=function(modeArg)
 			});
 
 		phases
-			.attr("fill",function(v){
-				if (v.__id===selectedPhase) return _this.style.phaseSelectedColor;
-				return _this.style.phaseColor;
-			})
+			.attr("fill",getFill)
 			.on("click",onClickPhase)
 			.call(drag)
 
@@ -414,8 +414,8 @@ var Planning=function(modeArg)
 
 	this.selectPhase=function(phase){
 		selectedPhase=phase;
-		if(selectedPhase!==null) trigger('select',phase)
 		this.draw();
+		if(selectedPhase!==null) trigger('select',phase)
 	}
 
 	this.setStepWidth=function(stepWidth) {
