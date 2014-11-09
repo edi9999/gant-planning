@@ -33,6 +33,9 @@
 			{"description":"Second Phase","start":3,"end":6,"price":200,"count":2}
 		])
 		.attachTo(document.getElementById('demo'))
+		.on('select',function(p){
+			console.log(p);
+		})
 		.draw();
 </script>
 </body>

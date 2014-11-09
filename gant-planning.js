@@ -1,7 +1,7 @@
 !function(){
 
 var gantplanning={
-	version:"0.1.9"
+	version:"0.2.0"
 };
 
 var Planning=function(modeArg)
@@ -100,7 +100,8 @@ var Planning=function(modeArg)
 	var cleanPhase=function(phase) {
 		phase.dx=0;
 		phase.dy=0;
-		phase.__id=idCount++;
+		if (typeof phase.__id==="undefined")
+			phase.__id=idCount++;
 		return phase;
 	};
 
@@ -210,6 +211,7 @@ var Planning=function(modeArg)
 				phase.dx=0;
 				phase.rx=0;
 			}
+			trigger('move',d)
 			_this.selectPhase(d);
 			_this.setWeeks(getMaxWeek());
 			_this.drawWeeks();
@@ -302,6 +304,10 @@ var Planning=function(modeArg)
 			.duration(_this.params.durationTime)
 			.attr("x",timeToCoordinate(3))
 			.attr("y",getY)
+
+		phases
+			.exit()
+			.remove()
 	}
 
 	var getPhasesTextBudget=function(){
@@ -322,7 +328,7 @@ var Planning=function(modeArg)
 			.attr("y",getTextY)
 
 		descriptions
-			.text(function(d){return getAttr(d,'count')+" x "+getAttr(d,'price')+ " €"})
+			.text(function(d){return getAttr(d,'count')+" x "+getAttr(d,'price')+ " €        -  "+getAttr(d,'count')*getAttr(d,'price')+" €"})
 			.on("click",onClickPhase)
 
 		descriptions
@@ -330,6 +336,10 @@ var Planning=function(modeArg)
 			.duration(_this.params.durationTime)
 			.attr("x",timeToCoordinate(4))
 			.attr("y",getTextY)
+
+		descriptions
+			.exit()
+			.remove()
 	}
 
 	var getPhasesRect=function(){
@@ -375,6 +385,10 @@ var Planning=function(modeArg)
 			.attr("width",getWidth)
 			.attr("x",getX)
 			.attr("y",getY)
+
+		phases
+			.exit()
+			.remove()
 	}
 
 	var getPhasesDescriptions=function(){
@@ -410,6 +424,10 @@ var Planning=function(modeArg)
 		descriptions.transition().duration(_this.params.durationTime)
 			.attr("x",getTextX)
 			.attr("y",getTextY)
+
+		descriptions
+			.exit()
+			.remove()
 	}
 
 	this.selectPhase=function(phase){
@@ -432,8 +450,27 @@ var Planning=function(modeArg)
 	}
 
 	this.addPhase=function(phase) {
+		var found=false;
+		this.phases.forEach(function (p,i) {
+			if(p.__id===phase.__id)
+				found=i;
+		})
+		if (found!==false)
+			this.phases.splice(found,1)
 		this.phases.push(cleanPhase(phase));
 		this.selectPhase(phase)
+	}
+
+	this.removePhase=function(phase) {
+		var found=false;
+		this.phases.forEach(function (p,i) {
+			if(p.__id===phase.__id)
+				found=i;
+		})
+		if (found){
+			this.phases.splice(found,1);
+		}
+		this.draw();
 	}
 
 	this.setMode=function(m){
