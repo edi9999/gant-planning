@@ -17,7 +17,6 @@ var Planning=function(modeArg)
 	var selectedPhase=null;
 	var onClickPhase=function(d){
 		d3.event.stopPropagation()
-		if (dragged) return;
 		_this.selectPhase(d.__id)
 	}
 
@@ -67,14 +66,14 @@ var Planning=function(modeArg)
 	}
 
 	var detectMoveDirection=function(xleft,width){
-		if (Math.abs(xleft)<_this.params.border*timeToCoordinate(1)) {
-				return "left";
-			}
+		if (Math.abs(xleft)<_this.params.border*timeToCoordinate(1))
+			return "left";
+
 		var xright=xleft-width;
 
-		if (Math.abs(xright)<_this.params.border*timeToCoordinate(1)) {
-				return "right";
-			}
+		if (Math.abs(xright)<_this.params.border*timeToCoordinate(1))
+			return "right";
+
 		return "none";
 	}
 
@@ -219,8 +218,14 @@ var Planning=function(modeArg)
 	var drawPhases=function() {
 		drawPhasesRects();
 		drawPhasesDescriptions();
-		if (mode=="budget")
+		if (mode=="budget"){
 			drawPhasesBudget()
+			drawPhasesTextBudget()
+		}
+		if (mode=='planning') {
+			getPhasesTextBudget().remove()
+			getPhasesBudget().remove()
+		}
 	}
 
 	var getPhasesBudget=function(){
@@ -237,7 +242,7 @@ var Planning=function(modeArg)
 			.append("rect")
 			.attr("class",function(v,i){return "phase-budget phase-"+v.__id})
 			.attr("height",_this.style.phaseHeight+"px")
-			.attr("x",timeToCoordinate(3))
+			.attr("x",timeToCoordinate(5))
 			.attr("y",function(v){return v.y+"px"})
 			.attr("width",timeToCoordinate(2))
 
@@ -247,6 +252,38 @@ var Planning=function(modeArg)
 				return _this.style.phaseColor;
 			})
 			.on("click",onClickPhase)
+
+		phases
+			.transition()
+			.duration(_this.params.durationTime)
+			.attr("x",timeToCoordinate(3))
+	}
+
+	var getPhasesTextBudget=function(){
+		return _this.mainElement.selectAll("text.phase-budget-description");
+	}
+
+	var drawPhasesTextBudget=function() {
+		var descriptions=getPhasesTextBudget()
+			.data(_this.phases,idGetter);
+
+		descriptions.enter()
+			.append("text")
+			.attr("class",function(v,i){return "phase-budget-description phase-"+v.__id})
+			.attr("text-anchor","middle")
+			.attr("font-size",_this.style.fontsize)
+			.attr("fill",_this.style.textColor)
+			.attr("x",timeToCoordinate(5))
+			.attr("y",function(v,i){return v.texty+"px"})
+
+		descriptions
+			.text(function(d){return d.count+" x "+d.price+ " €"})
+			.on("click",onClickPhase)
+
+		descriptions
+			.transition()
+			.duration(_this.params.durationTime)
+			.attr("x",timeToCoordinate(4))
 	}
 
 	var getPhasesRect=function(){
@@ -324,11 +361,7 @@ var Planning=function(modeArg)
 
 		descriptions
 			.text(function(d){return d.description})
-			.on("click",function(d){
-				d3.event.stopPropagation()
-				if (dragged) return;
-				_this.selectPhase(d.__id)
-			})
+			.on("click",onClickPhase)
 			.call(drag)
 
 		descriptions.transition().duration(_this.params.durationTime)
