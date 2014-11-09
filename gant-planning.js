@@ -1,7 +1,7 @@
 !function() {
 
 var gantplanning={
-	version:"0.1.2"
+	version:"0.1.3"
 };
 
 var Planning=function(modeArg)
@@ -11,18 +11,10 @@ var Planning=function(modeArg)
 	var timeToCoordinate;
 	var dragged;
 	if (typeof modeArg==="undefined")
-		modeArg="planning"
+		modeArg="planning";
 	var mode=modeArg;
 	var idCount=0;
 	var selectedPhase=null;
-	var onClickPhase=function(d){
-		d3.event.stopPropagation()
-		_this.selectPhase(d.__id)
-	}
-
-	var idGetter=function(p){
-		return p.__id;
-	};
 
 	this.style={
 		phaseColor:d3.rgb("#083968"),
@@ -45,7 +37,19 @@ var Planning=function(modeArg)
 		week:"S",
 		showWeeks:true,
 		durationTime:200
-	}
+	};
+
+	var getTextY=function(v,i){return v.texty+"px"};
+	var getTextX=function(v,i){return v.textx+"px"};
+	var getX=function(v){return v.x+"px"};
+	var getY=function(v){return v.y+"px"};
+	var getWidth=function(v){return v.width+"px"};
+	var getDescription=function(v){return v.description};
+	var idGetter=function(p){return p.__id;};
+	var onClickPhase=function(d){
+		d3.event.stopPropagation()
+		_this.selectPhase(d.__id)
+	};
 
 	var calcTimeToCoordinate=function() {
 		if (_this.style.stepWidth=="auto")
@@ -56,14 +60,14 @@ var Planning=function(modeArg)
 			timeToCoordinate = d3.scale.linear()
 				.domain([0,1])
 				.range([0,_this.style.stepWidth]);
-	}
+	};
 
 	var cleanPhase=function(phase) {
 		phase.dx=0;
 		phase.dy=0;
 		phase.__id=idCount++;
 		return phase;
-	}
+	};
 
 	var detectMoveDirection=function(xleft,width){
 		if (Math.abs(xleft)<_this.params.border*timeToCoordinate(1))
@@ -75,7 +79,7 @@ var Planning=function(modeArg)
 			return "right";
 
 		return "none";
-	}
+	};
 
 	var getMaxWeek=function() {
 		var max=_this.phases[0].end;
@@ -116,9 +120,9 @@ var Planning=function(modeArg)
 				if(d.start+timeToCoordinate.invert(d.rx)<=0)
 					d.rx=-timeToCoordinate(d.start);
 				_this.mainElement.selectAll(".phase.phase-"+d.__id)
-					.attr("x",function(v){return (v.x+d.rx)})
+					.attr("x",function(v){return (v.x+d.rx)});
 				_this.mainElement.selectAll(".phase-description.phase-"+d.__id)
-					.attr("x",function(v){return (v.textx+d.rx)})
+					.attr("x",function(v){return (v.textx+d.rx)});
 			}
 
 			if (currentMoveDirection=="right") {
@@ -126,27 +130,25 @@ var Planning=function(modeArg)
 					d.rx=timeToCoordinate(d.start-d.end+1);
 				}
 				_this.mainElement.selectAll(".phase.phase-"+d.__id)
-					.attr("width",function(v){return (v.width+d.rx)+"px"})
+					.attr("width",function(v){return (v.width+d.rx)+"px"});
 				_this.mainElement.selectAll(".phase-description.phase-"+d.__id)
-					.attr("x",function(v){return (v.textx+d.rx/2)+"px"})
+					.attr("x",function(v){return (v.textx+d.rx/2)+"px"});
 			}
 			if (currentMoveDirection=="left") {
 				if (d.end-d.start-timeToCoordinate.invert(d.rx)<=1) {
 					d.rx=timeToCoordinate(d.end-d.start-1);
 				}
 				_this.mainElement.selectAll(".phase-description.phase-"+d.__id)
-					.attr("x",function(v){return (v.textx+d.rx/2)+"px"})
+					.attr("x",function(v){return (v.textx+d.rx/2)+"px"});
 				_this.mainElement.selectAll(".phase.phase-"+d.__id)
 					.attr("x",function(v){return (v.x+d.rx)+"px"})
-					.attr("width",function(v){return (v.width-d.rx)+"px"})
+					.attr("width",function(v){return (v.width-d.rx)+"px"});
 			}
 		})
 		.on("dragend",function(d,i) {
 			if (mode!='planning') return;
-			if (dragged==false)
-			{
+			if (!dragged)
 				return true;
-			}
 			for(i=0;i<_this.phases.length;i++) {
 				var phase=_this.phases[i];
 				if (phase.dx!=0) {
@@ -243,7 +245,7 @@ var Planning=function(modeArg)
 			.attr("class",function(v,i){return "phase-budget phase-"+v.__id})
 			.attr("height",_this.style.phaseHeight+"px")
 			.attr("x",timeToCoordinate(5))
-			.attr("y",function(v){return v.y+"px"})
+			.attr("y",getY)
 			.attr("width",timeToCoordinate(2))
 
 		phases
@@ -257,6 +259,7 @@ var Planning=function(modeArg)
 			.transition()
 			.duration(_this.params.durationTime)
 			.attr("x",timeToCoordinate(3))
+			.attr("y",getY)
 	}
 
 	var getPhasesTextBudget=function(){
@@ -274,7 +277,7 @@ var Planning=function(modeArg)
 			.attr("font-size",_this.style.fontsize)
 			.attr("fill",_this.style.textColor)
 			.attr("x",timeToCoordinate(5))
-			.attr("y",function(v,i){return v.texty+"px"})
+			.attr("y",getTextY)
 
 		descriptions
 			.text(function(d){return d.count+" x "+d.price+ " €"})
@@ -284,6 +287,7 @@ var Planning=function(modeArg)
 			.transition()
 			.duration(_this.params.durationTime)
 			.attr("x",timeToCoordinate(4))
+			.attr("y",getTextY)
 	}
 
 	var getPhasesRect=function(){
@@ -298,11 +302,11 @@ var Planning=function(modeArg)
 
 		phases.enter()
 			.append("rect")
-			.attr("class",function(v,i){return "phase phase-"+v.__id})
+			.attr("class",function(v){return "phase phase-"+v.__id})
 			.attr("height",_this.style.phaseHeight+"px")
-			.attr("x",function(v){return v.x+"px"})
-			.attr("y",function(v){return v.y+"px"})
-			.attr("width",function(v){return v.width+"px"})
+			.attr("x",getX)
+			.attr("y",getY)
+			.attr("width",getWidth)
 			.on("mousemove",function(d,i){
 				var type=d3.event.target.nodeName;
 				var xleft = d3.event.offsetX==undefined?d3.event.layerX:d3.event.offsetX;
@@ -329,9 +333,9 @@ var Planning=function(modeArg)
 		phases
 			.transition()
 			.duration(_this.params.durationTime)
-			.attr("width",function(v){return v.width+"px"})
-			.attr("x",function(v){return v.x+"px"})
-			.attr("y",function(v){return v.y+"px"})
+			.attr("width",getWidth)
+			.attr("x",getX)
+			.attr("y",getY)
 	}
 
 	var getPhasesDescriptions=function(){
@@ -348,8 +352,8 @@ var Planning=function(modeArg)
 			.attr("text-anchor","middle")
 			.attr("font-size",_this.style.fontsize)
 			.attr("fill",_this.style.textColor)
-			.attr("x",function(v,i){return v.textx+"px"})
-			.attr("y",function(v,i){return v.texty+"px"})
+			.attr("x",getTextX)
+			.attr("y",getTextY)
 			.on("mousemove",function(d,i){
 				if (currentMoveDirection==undefined)
 					var moveDirection="none";
@@ -360,13 +364,13 @@ var Planning=function(modeArg)
 			});
 
 		descriptions
-			.text(function(d){return d.description})
+			.text(getDescription)
 			.on("click",onClickPhase)
-			.call(drag)
+			.call(drag);
 
 		descriptions.transition().duration(_this.params.durationTime)
-			.attr("x",function(v,i){return v.textx+"px"})
-			.attr("y",function(v,i){return v.texty+"px"})
+			.attr("x",getTextX)
+			.attr("y",getTextY)
 	}
 
 	this.selectPhase=function(id){
