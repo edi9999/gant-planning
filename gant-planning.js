@@ -1,7 +1,7 @@
 !function(){
 
 var gantplanning={
-	version:"0.1.6"
+	version:"0.1.7"
 };
 
 var Planning=function(modeArg)
@@ -15,6 +15,7 @@ var Planning=function(modeArg)
 	var mode=modeArg;
 	var idCount=0;
 	var selectedPhase=null;
+	var eventListeners={};
 
 	this.style={
 		phaseColor:d3.rgb("#083968"),
@@ -29,6 +30,19 @@ var Planning=function(modeArg)
 		weekColor:d3.rgb("#083968"),
 		weekBarColor:d3.rgb("#999999")
 	};
+
+	this.on=function(eventName,listener){
+		if (typeof eventListeners[eventName]==="undefined")
+			eventListeners[eventName]=[];
+		eventListeners[eventName].push(listener);
+		return this;
+	}
+
+	var trigger=function (eventName,data) {
+		if (typeof eventListeners[eventName]==="undefined")
+			return;
+		eventListeners[eventName].forEach(function (l) { l(data); });
+	}
 
 	var getAttr=function(d,name){
 		return d[_this.params.attributes[name]];
@@ -63,7 +77,7 @@ var Planning=function(modeArg)
 	var idGetter=function(p){return p.__id;};
 	var onClickPhase=function(d){
 		d3.event.stopPropagation()
-		_this.selectPhase(d.__id)
+		_this.selectPhase(d)
 	};
 
 	var calcTimeToCoordinate=function() {
@@ -190,7 +204,7 @@ var Planning=function(modeArg)
 				phase.dx=0;
 				phase.rx=0;
 			}
-			_this.selectPhase(d.__id);
+			_this.selectPhase(d);
 			_this.setWeeks(getMaxWeek());
 			_this.drawWeeks();
 			_this.draw();
@@ -398,8 +412,9 @@ var Planning=function(modeArg)
 			.attr("y",getTextY)
 	}
 
-	this.selectPhase=function(id){
-		selectedPhase=id;
+	this.selectPhase=function(phase){
+		selectedPhase=phase;
+		if(selectedPhase!==null) trigger('select',phase)
 		this.draw();
 	}
 
@@ -418,7 +433,7 @@ var Planning=function(modeArg)
 
 	this.addPhase=function(phase) {
 		this.phases.push(cleanPhase(phase));
-		this.selectPhase(phase.__id)
+		this.selectPhase(phase)
 	}
 
 	this.setMode=function(m){
