@@ -1,7 +1,7 @@
 !function(){
 
 var gantplanning={
-	version:"0.2.1"
+	version:"0.2.2"
 };
 
 var Planning=function(modeArg)
@@ -22,6 +22,7 @@ var Planning=function(modeArg)
 		phaseSelectedColor:d3.rgb("#333"),
 		stepWidth:"auto",
 		phaseHeight:35,
+		phaseMarginY:1,
 		textColor:d3.rgb("#F7F7F7"),
 		phaseY:30,
 		svgWidth:700,
@@ -235,8 +236,8 @@ var Planning=function(modeArg)
 	var calcCoordinates=function() {
 		for(i=0;i<_this.phases.length;i++) {
 			var phase=_this.phases[i];
-			phase.y=_this.style.phaseY+i*_this.style.phaseHeight;
-			phase.texty=_this.style.phaseY+_this.style.offsetTextY+i*_this.style.phaseHeight;
+			phase.y=_this.style.phaseY+i*( _this.style.phaseMarginY+_this.style.phaseHeight );
+			phase.texty=_this.style.phaseY+_this.style.offsetTextY+i*( _this.style.phaseMarginY+_this.style.phaseHeight );
 			if (mode==='planning') phase=calcCoordinatesPhasePlanningMode(phase);
 			if (mode==='budget') phase=calcCoordinatesPhaseBudgetMode(phase);
 			_this.phases[i]=phase;
@@ -247,7 +248,7 @@ var Planning=function(modeArg)
 		_this.mainElement
 			.transition()
 			.duration(_this.params.durationTime)
-			.attr("height",_this.phases.length*_this.style.phaseHeight+_this.style.phaseY)
+			.attr("height",_this.phases.length*( _this.style.phaseMarginY+_this.style.phaseHeight )+_this.style.phaseY)
 	}
 
 	var calcCoordinatesPhasePlanningMode=function(phase) {
