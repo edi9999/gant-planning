@@ -1,7 +1,7 @@
 !function(){
 
 var gantplanning={
-	version:"0.1.7"
+	version:"0.1.9"
 };
 
 var Planning=function(modeArg)
@@ -415,7 +415,7 @@ var Planning=function(modeArg)
 	this.selectPhase=function(phase){
 		selectedPhase=phase;
 		this.draw();
-		if(selectedPhase!==null) trigger('select',phase)
+		trigger('select',phase);
 	}
 
 	this.setStepWidth=function(stepWidth) {
