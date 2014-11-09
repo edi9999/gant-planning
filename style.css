@@ -1,8 +1,5 @@
 .gant-planning
 {
-	background-color:#F2F2F2;
-	width:700px;
-	height:400px;
 	padding:4px;
 }
 .gant-planning.mode-planning .description, .gant-planning.mode-planning .phase
