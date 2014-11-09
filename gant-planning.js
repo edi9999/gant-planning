@@ -15,6 +15,11 @@ var Planning=function(modeArg)
 	var mode=modeArg;
 	var idCount=0;
 	var selectedPhase=null;
+	var onClickPhase=function(d){
+		d3.event.stopPropagation()
+		if (dragged) return;
+		_this.selectPhase(d.__id)
+	}
 
 	var idGetter=function(p){
 		return p.__id;
@@ -39,13 +44,11 @@ var Planning=function(modeArg)
 		minWeeks:4,
 		border:0.3,
 		week:"S",
-		getPhase:"What should the name of this phase be ?",
 		showWeeks:true,
 		durationTime:200
 	}
 
-	var calcTimeToCoordinate=function()
-	{
+	var calcTimeToCoordinate=function() {
 		if (_this.style.stepWidth=="auto")
 			timeToCoordinate=d3.scale.linear()
 				.domain([0,_this.weeks])
@@ -75,8 +78,7 @@ var Planning=function(modeArg)
 		return "none";
 	}
 
-	var getMaxWeek=function()
-	{
+	var getMaxWeek=function() {
 		var max=_this.phases[0].end;
 		_this.phases.forEach(function(phase){
 			max=Math.max(max,phase.end);
@@ -105,11 +107,11 @@ var Planning=function(modeArg)
 			var difference=Math.round(timeToCoordinate.invert(d.dx))-timeToCoordinate.invert(d.dx);
 			var distance=Math.abs(difference);
 			if (distance<_this.params.sticky) {
-					d.rx= timeToCoordinate(Math.round(timeToCoordinate.invert(d.dx)));
-				}
+				d.rx= timeToCoordinate(Math.round(timeToCoordinate.invert(d.dx)));
+			}
 			else {
-					d.rx=d.dx;
-				}
+				d.rx=d.dx;
+			}
 
 			if (currentMoveDirection=="none") {
 				if(d.start+timeToCoordinate.invert(d.rx)<=0)
@@ -148,8 +150,7 @@ var Planning=function(modeArg)
 			}
 			for(i=0;i<_this.phases.length;i++) {
 				var phase=_this.phases[i];
-				if (phase.dx!=0)
-				{
+				if (phase.dx!=0) {
 					if(currentMoveDirection=="none") {
 						phase.x+=phase.rx;
 						var newStart=Math.round(timeToCoordinate.invert(phase.x));
@@ -215,14 +216,47 @@ var Planning=function(modeArg)
 		return phase;
 	}
 
-	var getPhases=function(){
+	var drawPhases=function() {
+		drawPhasesRects();
+		drawPhasesDescriptions();
+		if (mode=="budget")
+			drawPhasesBudget()
+	}
+
+	var getPhasesBudget=function(){
+		return _this
+			.mainElement
+			.selectAll("rect.phase-budget");
+	}
+
+	var drawPhasesBudget=function () {
+		var phases=getPhasesBudget()
+			.data(_this.phases,idGetter);
+
+		phases.enter()
+			.append("rect")
+			.attr("class",function(v,i){return "phase-budget phase-"+v.__id})
+			.attr("height",_this.style.phaseHeight+"px")
+			.attr("x",timeToCoordinate(3))
+			.attr("y",function(v){return v.y+"px"})
+			.attr("width",timeToCoordinate(2))
+
+		phases
+			.attr("fill",function(v){
+				if (v.__id===selectedPhase) return _this.style.phaseSelectedColor;
+				return _this.style.phaseColor;
+			})
+			.on("click",onClickPhase)
+	}
+
+	var getPhasesRect=function(){
 		return _this
 			.mainElement
 			.selectAll("rect.phase");
 	}
 
-	var drawPhases=function() {
-		var phases=getPhases()
+	var drawPhasesRects=function() {
+		var phases=getPhasesRect()
 			.data(_this.phases,idGetter);
 
 		phases.enter()
@@ -231,6 +265,7 @@ var Planning=function(modeArg)
 			.attr("height",_this.style.phaseHeight+"px")
 			.attr("x",function(v){return v.x+"px"})
 			.attr("y",function(v){return v.y+"px"})
+			.attr("width",function(v){return v.width+"px"})
 			.on("mousemove",function(d,i){
 				var type=d3.event.target.nodeName;
 				var xleft = d3.event.offsetX==undefined?d3.event.layerX:d3.event.offsetX;
@@ -251,11 +286,7 @@ var Planning=function(modeArg)
 				if (v.__id===selectedPhase) return _this.style.phaseSelectedColor;
 				return _this.style.phaseColor;
 			})
-			.on("click",function(d){
-				d3.event.stopPropagation()
-				if (dragged) return;
-				_this.selectPhase(d.__id)
-			})
+			.on("click",onClickPhase)
 			.call(drag)
 
 		phases
@@ -270,7 +301,7 @@ var Planning=function(modeArg)
 		return _this.mainElement.selectAll("text.phase-description");
 	}
 
-	var drawDescriptions=function() {
+	var drawPhasesDescriptions=function() {
 		var descriptions=getPhasesDescriptions()
 			.data(_this.phases,idGetter);
 
@@ -346,8 +377,7 @@ var Planning=function(modeArg)
 		return this;
 	}
 
-	this.setWeeks=function(n)
-	{
+	this.setWeeks=function(n) {
 		if (n===undefined) n=0;
 		this.weeks=Math.max(n,this.params.minWeeks);
 		calcTimeToCoordinate();
@@ -398,8 +428,7 @@ var Planning=function(modeArg)
 		weekBars.exit().remove();
 	}
 
-	this.drawWeeks=function()
-	{
+	this.drawWeeks=function() {
 		drawWeekBars();
 		drawWeekDescriptions();
 	}
@@ -417,14 +446,14 @@ var Planning=function(modeArg)
 	this.draw=function() {
 		addModeClass();
 		reorderPhases();
-		if (this.params.showWeeks==true) {
+		if (this.params.showWeeks) {
 			if (mode=='planning')
 				this.setWeeks(getMaxWeek());
 			if (mode=='budget')
-				this.setWeeks(2);
+				this.setWeeks(5);
 		}
 		calcTimeToCoordinate();
-		if (this.params.showWeeks==true) {
+		if (this.params.showWeeks) {
 			if (mode=='planning')
 				this.drawWeeks();
 			if (mode=='budget')
@@ -432,7 +461,6 @@ var Planning=function(modeArg)
 		}
 		calcCoordinates();
 		drawPhases();
-		drawDescriptions();
 		return this;
 	}
 
