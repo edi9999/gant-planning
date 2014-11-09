@@ -1,7 +1,7 @@
-!function() {
+!function(){
 
 var gantplanning={
-	version:"0.1.4"
+	version:"0.1.5"
 };
 
 var Planning=function(modeArg)
@@ -30,12 +30,26 @@ var Planning=function(modeArg)
 		weekBarColor:d3.rgb("#999999")
 	};
 
+	var getAttr=function(d,name){
+		return d[_this.params.attributes[name]];
+	}
+
+	var setAttr=function(d,name,value){
+		return d[_this.params.attributes[name]]=value;
+	}
+
 	this.params={
 		sticky:0.1,
 		minWeeks:4,
 		border:0.3,
 		week:"S",
 		showWeeks:true,
+		attributes:{
+			'start':'start',
+			'end':'end',
+			'price':'price',
+			'count':'count'
+		},
 		durationTime:200
 	};
 
@@ -84,7 +98,7 @@ var Planning=function(modeArg)
 	var getMaxWeek=function() {
 		var max=0;
 		_this.phases.forEach(function(phase){
-			max=Math.max(max,phase.end);
+			max=Math.max(max,getAttr(phase,'end'));
 		});
 		return max;
 	};
@@ -117,8 +131,8 @@ var Planning=function(modeArg)
 			}
 
 			if (currentMoveDirection=="none") {
-				if(d.start+timeToCoordinate.invert(d.rx)<=0)
-					d.rx=-timeToCoordinate(d.start);
+				if(getAttr(d,'start')+timeToCoordinate.invert(d.rx)<=0)
+					d.rx=-timeToCoordinate(getAttr(d,'start'));
 				_this.mainElement.selectAll(".phase.phase-"+d.__id)
 					.attr("x",function(v){return (v.x+d.rx)});
 				_this.mainElement.selectAll(".phase-description.phase-"+d.__id)
@@ -126,8 +140,8 @@ var Planning=function(modeArg)
 			}
 
 			if (currentMoveDirection=="right") {
-				if (d.end-d.start+timeToCoordinate.invert(d.rx)<=1) {
-					d.rx=timeToCoordinate(d.start-d.end+1);
+				if (getAttr(d,'end')-getAttr(d,'start')+timeToCoordinate.invert(d.rx)<=1) {
+					d.rx=timeToCoordinate(getAttr(d,'start')-getAttr(d,'end')+1);
 				}
 				_this.mainElement.selectAll(".phase.phase-"+d.__id)
 					.attr("width",function(v){return (v.width+d.rx)+"px"});
@@ -135,8 +149,8 @@ var Planning=function(modeArg)
 					.attr("x",function(v){return (v.textx+d.rx/2)+"px"});
 			}
 			if (currentMoveDirection=="left") {
-				if (d.end-d.start-timeToCoordinate.invert(d.rx)<=1) {
-					d.rx=timeToCoordinate(d.end-d.start-1);
+				if (getAttr(d,'end')-getAttr(d,'start')-timeToCoordinate.invert(d.rx)<=1) {
+					d.rx=timeToCoordinate(getAttr(d,'end')-getAttr(d,'start')-1);
 				}
 				_this.mainElement.selectAll(".phase-description.phase-"+d.__id)
 					.attr("x",function(v){return (v.textx+d.rx/2)+"px"});
@@ -155,18 +169,20 @@ var Planning=function(modeArg)
 					if(currentMoveDirection=="none") {
 						phase.x+=phase.rx;
 						var newStart=Math.round(timeToCoordinate.invert(phase.x));
-						phase.end=newStart+phase.end-phase.start;
-						phase.start=newStart;
+						setAttr(phase,'end',newStart+getAttr(phase,'end')-getAttr(phase,'start'));
+						setAttr(phase,'start',newStart);
 						currentMoveDirection=undefined;
 					}
 					if (currentMoveDirection=="right") {
-						phase.end=Math.round(timeToCoordinate.invert(phase.x+phase.width+phase.rx));
-						if (phase.end<phase.start+1) phase.end=phase.start+1;
+						setAttr(phase,'end',Math.round(timeToCoordinate.invert(phase.x+phase.width+phase.rx)));
+						if (getAttr(phase,'end')<getAttr(phase,'start')+1)
+							setAttr(phase,'end',getAttr(phase,'start')+1);
 						currentMoveDirection=undefined;
 					}
 					if (currentMoveDirection=="left") {
-						phase.start=Math.round(timeToCoordinate.invert(phase.x+phase.rx));
-						if (phase.start>phase.end-1) phase.start=phase.end-1;
+						setAttr(phase,'start',Math.round(timeToCoordinate.invert(phase.x+phase.rx)));
+						if (getAttr(phase,'start')>getAttr(phase,'end')-1)
+							setAttr(phase,'start',getAttr(phase,'end')-1);
 						currentMoveDirection=undefined;
 					}
 				}
@@ -182,8 +198,8 @@ var Planning=function(modeArg)
 
 	var reorderPhases=function() {
 		_this.phases.sort(function(a,b){
-			var x = a.start+1/100*a.end;
-			var y = b.start+1/100*b.end;
+			var x = getAttr(a,'start')+1/100*getAttr(a,'end');
+			var y = getAttr(b,'start')+1/100*getAttr(b,'end');
 			if (x<y) return -1;
 			if (x>y) return 1;
 			if (a.description<b.description) return -1;
@@ -204,9 +220,9 @@ var Planning=function(modeArg)
 	}
 
 	var calcCoordinatesPhasePlanningMode=function(phase) {
-		phase.x=timeToCoordinate(phase.start);
-		phase.textx=timeToCoordinate((phase.start+phase.end)/2);
-		phase.width=timeToCoordinate(phase.end-phase.start);
+		phase.x=timeToCoordinate(getAttr(phase,'start'));
+		phase.textx=timeToCoordinate((getAttr(phase,'start')+getAttr(phase,'end'))/2);
+		phase.width=timeToCoordinate(getAttr(phase,'end')-getAttr(phase,'start'));
 		return phase;
 	}
 
@@ -280,7 +296,7 @@ var Planning=function(modeArg)
 			.attr("y",getTextY)
 
 		descriptions
-			.text(function(d){return d.count+" x "+d.price+ " €"})
+			.text(function(d){return getAttr(d,'count')+" x "+getAttr(d,'price')+ " €"})
 			.on("click",onClickPhase)
 
 		descriptions
