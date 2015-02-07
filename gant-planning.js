@@ -80,7 +80,7 @@ var Planning=function(modeArg)
 	var getX=function(v){return v.x+"px"};
 	var getY=function(v){return v.y+"px"};
 	var getWidth=function(v){return v.width+"px"};
-	var getDescription=function(v){return getAttr(v,'description')};
+	this.getDescription=function(v){return getAttr(v,'description')};
 	var idGetter=function(p){return p.__id;};
 	var onClickPhase=function(d){
 		d3.event.stopPropagation()
@@ -418,7 +418,7 @@ var Planning=function(modeArg)
 			});
 
 		descriptions
-			.text(getDescription)
+			.text(_this.getDescription)
 			.on("click",onClickPhase)
 			.call(drag);
 
