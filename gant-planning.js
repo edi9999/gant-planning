@@ -6,7 +6,7 @@ var gantplanning={
 
 var Planning=function(modeArg)
 {
-	var currentMoveDirection=undefined;
+	var currentMoveDirection;
 	var _this=this;
 	var timeToCoordinate;
 	var dragged;
@@ -37,27 +37,27 @@ var Planning=function(modeArg)
 			eventListeners[eventName]=[];
 		eventListeners[eventName].push(listener);
 		return this;
-	}
+	};
 
 	var getFill=function(v){
 		if (selectedPhase===null) return _this.style.phaseColor;
 		if (v.__id===selectedPhase.__id) return _this.style.phaseSelectedColor;
 		return _this.style.phaseColor;
-	}
+	};
 
 	var trigger=function (eventName,data) {
 		if (typeof eventListeners[eventName]==="undefined")
 			return;
 		eventListeners[eventName].forEach(function (l) { l(data); });
-	}
+	};
 
 	var getAttr=function(d,name){
 		return d[_this.params.attributes[name]];
-	}
+	};
 
 	var setAttr=function(d,name,value){
-		return d[_this.params.attributes[name]]=value;
-	}
+		d[_this.params.attributes[name]]=value;
+	};
 
 	this.params={
 		sticky:0.1,
@@ -75,23 +75,23 @@ var Planning=function(modeArg)
 		durationTime:200
 	};
 
-	var getTextY=function(v,i){return v.texty+"px"};
-	var getTextX=function(v,i){return v.textx+"px"};
-	var getX=function(v){return v.x+"px"};
-	var getY=function(v){return v.y+"px"};
-	var getWidth=function(v){return v.width+"px"};
-	this.getDescription=function(v){return getAttr(v,'description')};
+	var getTextY=function(v,i){return v.texty+"px";};
+	var getTextX=function(v,i){return v.textx+"px";};
+	var getX=function(v){return v.x+"px";};
+	var getY=function(v){return v.y+"px";};
+	var getWidth=function(v){return v.width+"px";};
+	this.getDescription=function(v){return getAttr(v,'description');};
 	var idGetter=function(p){return p.__id;};
 	var onClickPhase=function(d){
-		d3.event.stopPropagation()
-		_this.selectPhase(d)
+		d3.event.stopPropagation();
+		_this.selectPhase(d);
 	};
 
 	var calcTimeToCoordinate=function() {
 		if (_this.style.stepWidth=="auto")
 			timeToCoordinate=d3.scale.linear()
 				.domain([0,_this.weeks])
-				.range([0,_this.style.svgWidth])
+				.range([0,_this.style.svgWidth]);
 		else
 			timeToCoordinate = d3.scale.linear()
 				.domain([0,1])
@@ -130,7 +130,7 @@ var Planning=function(modeArg)
 		.on("dragstart", function(d,i) {
 			if (mode!='planning') return;
 			var type=d3.event.sourceEvent.target.nodeName;
-			var xleft = d3.event.sourceEvent.offsetX==undefined?d3.event.sourceEvent.layerX:d3.event.sourceEvent.offsetX;
+			var xleft = d3.event.sourceEvent.offsetX===undefined?d3.event.sourceEvent.layerX:d3.event.sourceEvent.offsetX;
 			xleft-=d.x;
 			if (type=="text")
 				currentMoveDirection="none";
@@ -153,33 +153,33 @@ var Planning=function(modeArg)
 				d.rx=d.dx;
 			}
 
-			if (currentMoveDirection=="none") {
+			if (currentMoveDirection==="none") {
 				if(getAttr(d,'start')+timeToCoordinate.invert(d.rx)<=0)
 					d.rx=-timeToCoordinate(getAttr(d,'start'));
 				_this.mainElement.selectAll(".phase.phase-"+d.__id)
-					.attr("x",function(v){return (v.x+d.rx)});
+					.attr("x",function(v){return (v.x+d.rx);});
 				_this.mainElement.selectAll(".phase-description.phase-"+d.__id)
-					.attr("x",function(v){return (v.textx+d.rx)});
+					.attr("x",function(v){return (v.textx+d.rx);});
 			}
 
-			if (currentMoveDirection=="right") {
+			if (currentMoveDirection==="right") {
 				if (getAttr(d,'end')-getAttr(d,'start')+timeToCoordinate.invert(d.rx)<=1) {
 					d.rx=timeToCoordinate(getAttr(d,'start')-getAttr(d,'end')+1);
 				}
 				_this.mainElement.selectAll(".phase.phase-"+d.__id)
-					.attr("width",function(v){return (v.width+d.rx)+"px"});
+					.attr("width",function(v){return (v.width+d.rx)+"px";});
 				_this.mainElement.selectAll(".phase-description.phase-"+d.__id)
-					.attr("x",function(v){return (v.textx+d.rx/2)+"px"});
+					.attr("x",function(v){return (v.textx+d.rx/2)+"px";});
 			}
 			if (currentMoveDirection=="left") {
 				if (getAttr(d,'end')-getAttr(d,'start')-timeToCoordinate.invert(d.rx)<=1) {
 					d.rx=timeToCoordinate(getAttr(d,'end')-getAttr(d,'start')-1);
 				}
 				_this.mainElement.selectAll(".phase-description.phase-"+d.__id)
-					.attr("x",function(v){return (v.textx+d.rx/2)+"px"});
+					.attr("x",function(v){return (v.textx+d.rx/2)+"px";});
 				_this.mainElement.selectAll(".phase.phase-"+d.__id)
-					.attr("x",function(v){return (v.x+d.rx)+"px"})
-					.attr("width",function(v){return (v.width-d.rx)+"px"});
+					.attr("x",function(v){return (v.x+d.rx)+"px";})
+					.attr("width",function(v){return (v.width-d.rx)+"px";});
 			}
 		})
 		.on("dragend",function(d,i) {
@@ -188,7 +188,7 @@ var Planning=function(modeArg)
 				return true;
 			for(i=0;i<_this.phases.length;i++) {
 				var phase=_this.phases[i];
-				if (phase.dx!=0) {
+				if (phase.dx!==0) {
 					if(currentMoveDirection=="none") {
 						phase.x+=phase.rx;
 						var newStart=Math.round(timeToCoordinate.invert(phase.x));
@@ -212,7 +212,7 @@ var Planning=function(modeArg)
 				phase.dx=0;
 				phase.rx=0;
 			}
-			trigger('move',d)
+			trigger('move',d);
 			_this.selectPhase(d);
 			_this.setWeeks(getMaxWeek());
 			_this.drawWeeks();
@@ -220,17 +220,19 @@ var Planning=function(modeArg)
 			currentMoveDirection=undefined;
 		});
 
+    this.sortFunction=function(a,b){
+        var x = getAttr(a,'start')+1/100*getAttr(a,'end');
+        var y = getAttr(b,'start')+1/100*getAttr(b,'end');
+        if (x<y) return -1;
+        if (x>y) return 1;
+        if (getAttr(a,'description')<getAttr(b,'description')) return -1;
+        if (getAttr(a,'description')>getAttr(b,'description')) return 1;
+        if (a.__id<b.__id) return -1;
+        return 1;
+    };
+
 	var reorderPhases=function() {
-		_this.phases.sort(function(a,b){
-			var x = getAttr(a,'start')+1/100*getAttr(a,'end');
-			var y = getAttr(b,'start')+1/100*getAttr(b,'end');
-			if (x<y) return -1;
-			if (x>y) return 1;
-			if (getAttr(a,'description')<getAttr(b,'description')) return -1;
-			if (getAttr(a,'description')>getAttr(b,'description')) return 1;
-			if (a.__id<b.__id) return -1;
-			return 1;
-		});
+		_this.phases.sort(_this.sortFunction);
 	};
 
 	var calcCoordinates=function() {
@@ -242,47 +244,47 @@ var Planning=function(modeArg)
 			if (mode==='budget') phase=calcCoordinatesPhaseBudgetMode(phase);
 			_this.phases[i]=phase;
 		}
-	}
+	};
 
 	var resizeTotalHeight=function(){
 		_this.mainElement
 			.transition()
 			.duration(_this.params.durationTime)
-			.attr("height",_this.phases.length*( _this.style.phaseMarginY+_this.style.phaseHeight )+_this.style.phaseY)
-	}
+			.attr("height",_this.phases.length*( _this.style.phaseMarginY+_this.style.phaseHeight )+_this.style.phaseY);
+	};
 
 	var calcCoordinatesPhasePlanningMode=function(phase) {
 		phase.x=timeToCoordinate(getAttr(phase,'start'));
 		phase.textx=timeToCoordinate((getAttr(phase,'start')+getAttr(phase,'end'))/2);
 		phase.width=timeToCoordinate(getAttr(phase,'end')-getAttr(phase,'start'));
 		return phase;
-	}
+	};
 
 	var calcCoordinatesPhaseBudgetMode=function(phase) {
 		phase.x=0;
 		phase.textx=timeToCoordinate(1);
 		phase.width=timeToCoordinate(2);
 		return phase;
-	}
+	};
 
 	var drawPhases=function() {
 		drawPhasesRects();
 		drawPhasesDescriptions();
 		if (mode=="budget"){
-			drawPhasesBudget()
-			drawPhasesTextBudget()
+			drawPhasesBudget();
+			drawPhasesTextBudget();
 		}
 		if (mode=='planning') {
-			getPhasesTextBudget().remove()
-			getPhasesBudget().remove()
+			getPhasesTextBudget().remove();
+			getPhasesBudget().remove();
 		}
-	}
+	};
 
 	var getPhasesBudget=function(){
 		return _this
 			.mainElement
 			.selectAll("rect.phase-budget");
-	}
+	};
 
 	var drawPhasesBudget=function () {
 		var phases=getPhasesBudget()
@@ -290,30 +292,30 @@ var Planning=function(modeArg)
 
 		phases.enter()
 			.append("rect")
-			.attr("class",function(v,i){return "phase-budget phase-"+v.__id})
+			.attr("class",function(v,i){return "phase-budget phase-"+v.__id;})
 			.attr("height",_this.style.phaseHeight+"px")
 			.attr("x",timeToCoordinate(5))
 			.attr("y",getY)
-			.attr("width",timeToCoordinate(2))
+			.attr("width",timeToCoordinate(2));
 
 		phases
 			.attr("fill",getFill)
-			.on("click",onClickPhase)
+			.on("click",onClickPhase);
 
 		phases
 			.transition()
 			.duration(_this.params.durationTime)
 			.attr("x",timeToCoordinate(3))
-			.attr("y",getY)
+			.attr("y",getY);
 
 		phases
 			.exit()
-			.remove()
-	}
+			.remove();
+	};
 
 	var getPhasesTextBudget=function(){
 		return _this.mainElement.selectAll("text.phase-budget-description");
-	}
+	};
 
 	var drawPhasesTextBudget=function() {
 		var descriptions=getPhasesTextBudget()
@@ -321,100 +323,102 @@ var Planning=function(modeArg)
 
 		descriptions.enter()
 			.append("text")
-			.attr("class",function(v,i){return "phase-budget-description phase-"+v.__id})
+			.attr("class",function(v,i){return "phase-budget-description phase-"+v.__id;})
 			.attr("text-anchor","middle")
 			.attr("font-size",_this.style.fontsize)
 			.attr("fill",_this.style.textColor)
 			.attr("x",timeToCoordinate(5))
-			.attr("y",getTextY)
+			.attr("y",getTextY);
 
 		descriptions
-			.text(function(d){return getAttr(d,'count')+" x "+getAttr(d,'price')+ " €        -  "+getAttr(d,'count')*getAttr(d,'price')+" €"})
-			.on("click",onClickPhase)
+			.text(function(d){return getAttr(d,'count')+" x "+getAttr(d,'price')+ " €        -  "+getAttr(d,'count')*getAttr(d,'price')+" €";})
+			.on("click",onClickPhase);
 
 		descriptions
 			.transition()
 			.duration(_this.params.durationTime)
 			.attr("x",timeToCoordinate(4))
-			.attr("y",getTextY)
+			.attr("y",getTextY);
 
 		descriptions
 			.exit()
-			.remove()
-	}
+			.remove();
+	};
 
 	var getPhasesRect=function(){
 		return _this
 			.mainElement
 			.selectAll("rect.phase");
-	}
+	};
 
 	var drawPhasesRects=function() {
 		var phases=getPhasesRect()
 			.data(_this.phases,idGetter);
+        var moveDirection;
 
 		phases.enter()
 			.append("rect")
-			.attr("class",function(v){return "phase phase-"+v.__id})
+			.attr("class",function(v){return "phase phase-"+v.__id;})
 			.attr("height",_this.style.phaseHeight+"px")
 			.attr("x",getX)
 			.attr("y",getY)
 			.attr("width",getWidth)
 			.on("mousemove",function(d,i){
 				var type=d3.event.target.nodeName;
-				var xleft = d3.event.offsetX==undefined?d3.event.layerX:d3.event.offsetX;
+				var xleft = d3.event.offsetX===undefined?d3.event.layerX:d3.event.offsetX;
 				if (type=="rect")
 					xleft-=d.x;
 				if (type=="text")
 					xleft-=d.x;
-				if (currentMoveDirection==undefined)
-					var moveDirection=detectMoveDirection(xleft,d.width)
+				if (currentMoveDirection===undefined)
+					moveDirection=detectMoveDirection(xleft,d.width);
 				else
-					var moveDirection=currentMoveDirection;
+					moveDirection=currentMoveDirection;
 				d3.select(this)
-					.attr("class",function(v){return "phase phase-"+v.__id+" stretch-"+moveDirection})
+					.attr("class",function(v){return "phase phase-"+v.__id+" stretch-"+moveDirection;});
 			});
 
 		phases
 			.attr("fill",getFill)
 			.on("click",onClickPhase)
-			.call(drag)
+			.call(drag);
 
 		phases
 			.transition()
 			.duration(_this.params.durationTime)
 			.attr("width",getWidth)
 			.attr("x",getX)
-			.attr("y",getY)
+			.attr("y",getY);
 
 		phases
 			.exit()
-			.remove()
-	}
+			.remove();
+	};
 
 	var getPhasesDescriptions=function(){
 		return _this.mainElement.selectAll("text.phase-description");
-	}
+	};
 
 	var drawPhasesDescriptions=function() {
 		var descriptions=getPhasesDescriptions()
 			.data(_this.phases,idGetter);
+        var moveDirection;
 
 		descriptions.enter()
 			.append("text")
-			.attr("class",function(v,i){return "phase-description phase-"+v.__id})
+			.attr("class",function(v,i){return "phase-description phase-"+v.__id;})
 			.attr("text-anchor","middle")
 			.attr("font-size",_this.style.fontsize)
 			.attr("fill",_this.style.textColor)
 			.attr("x",getTextX)
 			.attr("y",getTextY)
 			.on("mousemove",function(d,i){
-				if (currentMoveDirection==undefined)
-					var moveDirection="none";
+				if (currentMoveDirection===undefined)
+					moveDirection="none";
 				else
-					var moveDirection=currentMoveDirection;
+					moveDirection=currentMoveDirection;
 				d3.select(this)
-					.attr("class",function(v){return "phase-description phase-"+v.__id+" stretch-"+moveDirection})
+					.attr("class",function(v){return "phase-description phase-"+v.__id+" stretch-"+moveDirection;});
 			});
 
 		descriptions
@@ -424,23 +428,23 @@ var Planning=function(modeArg)
 
 		descriptions.transition().duration(_this.params.durationTime)
 			.attr("x",getTextX)
-			.attr("y",getTextY)
+			.attr("y",getTextY);
 
 		descriptions
 			.exit()
-			.remove()
-	}
+			.remove();
+	};
 
 	this.selectPhase=function(phase){
 		selectedPhase=phase;
 		this.draw();
 		trigger('select',phase);
-	}
+	};
 
 	this.setStepWidth=function(stepWidth) {
 		this.style.stepWidth=stepWidth;
 		calcTimeToCoordinate();
-	}
+	};
 
 	this.fill=function(phases) {
 		this.phases=phases;
@@ -448,37 +452,37 @@ var Planning=function(modeArg)
 			this.phases[i]=cleanPhase(this.phases[i]);
 		}
 		return this;
-	}
+	};
 
 	this.addPhase=function(phase) {
 		var found=false;
 		this.phases.forEach(function (p,i) {
 			if(p.__id===phase.__id)
 				found=i;
-		})
+		});
 		if (found!==false)
-			this.phases.splice(found,1)
+			this.phases.splice(found,1);
 		this.phases.push(cleanPhase(phase));
-	}
+	};
 
 	this.removePhase=function(phase) {
 		var found=false;
 		this.phases.forEach(function (p,i) {
 			if(p.__id===phase.__id)
 				found=i;
-		})
+		});
 		if (found!==false){
 			this.phases.splice(found,1);
 		}
 		this.draw();
-	}
+	};
 
 	this.setMode=function(m){
 		if (m!=='budget' && m!=='planning') return;
 		mode=m;
 		this.draw();
 		return this;
-	}
+	};
 
 	this.attachTo=function(element) {
 		this.element=element;
@@ -487,22 +491,22 @@ var Planning=function(modeArg)
 
 		this.mainElement.on('click',function () {
 			_this.selectPhase(null);
-		})
+		});
 		return this;
-	}
+	};
 
 	this.setWeeks=function(n) {
 		if (n===undefined) n=0;
 		this.weeks=Math.max(n,this.params.minWeeks);
 		calcTimeToCoordinate();
-	}
+	};
 
 	var getWeekDescriptions=function(){
 		return _this.mainElement.selectAll("text.week-description");
-	}
+	};
 	var getWeekBars=function(){
 		return _this.mainElement.selectAll("rect.week-bars");
-	}
+	};
 
 	var drawWeekDescriptions=function(){
 		var weeks=Array.apply(null, {length: _this.weeks}).map(Number.call, Number);
@@ -518,10 +522,10 @@ var Planning=function(modeArg)
 			.attr("fill",_this.style.weekColor)
 			.attr("y",17)
 			.attr("x",function(w){return timeToCoordinate(w+0.5);})
-			.text(function(d){return _this.params.week+" "+(d+1)});
+			.text(function(d){return _this.params.week+" "+(d+1);});
 
 		weekDescriptions.exit().remove();
-	}
+	};
 
 	var drawWeekBars=function(){
 		var weeksForBars=Array.apply(null, {length: _this.weeks+1}).map(Number.call, Number);
@@ -540,12 +544,12 @@ var Planning=function(modeArg)
 			.attr("fill",_this.style.weekBarColor);
 
 		weekBars.exit().remove();
-	}
+	};
 
 	this.drawWeeks=function() {
 		drawWeekBars();
 		drawWeekDescriptions();
-	}
+	};
 
 	this.clearWeeks=function(){
 		getWeekBars().remove();
@@ -555,7 +559,7 @@ var Planning=function(modeArg)
 	var addModeClass=function(){
 		_this.mainElement
 			.attr("class","gant-planning "+"mode-"+mode);
-	}
+	};
 
 	this.draw=function() {
 		resizeTotalHeight();
@@ -577,15 +581,15 @@ var Planning=function(modeArg)
 		calcCoordinates();
 		drawPhases();
 		return this;
-	}
+	};
 
 	dragged=false;
 	this.phases=[];
-}
+};
 
 gantplanning.createPlanning=function(planning) {
 	return new Planning();
-}
+};
 
 this.gantplanning=gantplanning;
-}()
+}();
