@@ -1,0 +1,23 @@
+{
+  "name": "gant-planning",
+  "version": "0.2.4",
+  "description": "gant-planning =============",
+  "main": "gant-planning.js",
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^2.7.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/edi9999/gant-planning.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/edi9999/gant-planning/issues"
+  },
+  "homepage": "https://github.com/edi9999/gant-planning#readme"
+}
