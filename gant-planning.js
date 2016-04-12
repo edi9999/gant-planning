@@ -130,8 +130,7 @@ var Planning=function(modeArg)
 		.on("dragstart", function(d,i) {
 			if (mode!='planning') return;
 			var type=d3.event.sourceEvent.target.nodeName;
-			var xleft = d3.event.sourceEvent.offsetX===undefined?d3.event.sourceEvent.layerX:d3.event.sourceEvent.offsetX;
-			xleft-=d.x;
+			var xleft = d3.event.sourceEvent.layerX-d.x;
 			if (type=="text")
 				currentMoveDirection="none";
 			else
@@ -365,10 +364,10 @@ var Planning=function(modeArg)
 			.attr("width",getWidth)
 			.on("mousemove",function(d,i){
 				var type=d3.event.target.nodeName;
-				var xleft = d3.event.offsetX===undefined?d3.event.layerX:d3.event.offsetX;
-				if (type=="rect")
+				var xleft = d3.event.layerX;
+				if (type==="rect")
 					xleft-=d.x;
-				if (type=="text")
+				if (type==="text")
 					xleft-=d.x;
 				if (currentMoveDirection===undefined)
 					moveDirection=detectMoveDirection(xleft,d.width);
