@@ -1,6 +1,6 @@
 {
   "name": "gant-planning",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "gant-planning =============",
   "main": "gant-planning.js",
   "dependencies": {},
