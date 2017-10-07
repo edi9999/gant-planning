@@ -1,7 +1,7 @@
 !function(){
 
 	var gantplanning={
-		version:"0.2.4"
+		version:"0.2.6"
 	};
 
 	var Planning=function(modeArg)
@@ -330,7 +330,7 @@
 			.attr("y",getTextY);
 
 			descriptions
-			.text(function(d){return getAttr(d,'count')+" x "+getAttr(d,'price')+ " €        -  "+getAttr(d,'count')*getAttr(d,'price')+" €";})
+			.text(function(d){return getAttr(d,'count')+" x "+getAttr(d,'price')+ " €        =  "+getAttr(d,'count')*getAttr(d,'price')+" €";})
 			.on("click",onClickPhase);
 
 			descriptions
