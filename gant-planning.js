@@ -75,11 +75,11 @@
 			durationTime:200
 		};
 
-		var getTextY=function(v,i){return v.texty+"px";};
-		var getTextX=function(v,i){return v.textx+"px";};
-		var getX=function(v){return v.x+"px";};
-		var getY=function(v){return v.y+"px";};
-		var getWidth=function(v){return v.width+"px";};
+		var getTextY=function(v,i){return v.texty;};
+		var getTextX=function(v,i){return v.textx;};
+		var getX=function(v){return v.x;};
+		var getY=function(v){return v.y;};
+		var getWidth=function(v){return v.width;};
 		this.getDescription=function(v){return getAttr(v,'description');};
 		var idGetter=function(p){return p.__id;};
 		var onClickPhase=function(d){
@@ -166,19 +166,19 @@
 					d.rx=timeToCoordinate(getAttr(d,'start')-getAttr(d,'end')+1);
 				}
 				_this.mainElement.selectAll(".phase.phase-"+d.__id)
-				.attr("width",function(v){return (v.width+d.rx)+"px";});
+				.attr("width",function(v){return (v.width+d.rx);});
 				_this.mainElement.selectAll(".phase-description.phase-"+d.__id)
-				.attr("x",function(v){return (v.textx+d.rx/2)+"px";});
+				.attr("x",function(v){return (v.textx+d.rx/2);});
 			}
 			if (currentMoveDirection=="left") {
 				if (getAttr(d,'end')-getAttr(d,'start')-timeToCoordinate.invert(d.rx)<=1) {
 					d.rx=timeToCoordinate(getAttr(d,'end')-getAttr(d,'start')-1);
 				}
 				_this.mainElement.selectAll(".phase-description.phase-"+d.__id)
-				.attr("x",function(v){return (v.textx+d.rx/2)+"px";});
+				.attr("x",function(v){return (v.textx+d.rx/2);});
 				_this.mainElement.selectAll(".phase.phase-"+d.__id)
-				.attr("x",function(v){return (v.x+d.rx)+"px";})
-				.attr("width",function(v){return (v.width-d.rx)+"px";});
+				.attr("x",function(v){return (v.x+d.rx);})
+				.attr("width",function(v){return (v.width-d.rx);});
 			}
 		})
 		.on("dragend",function(d,i) {
@@ -249,7 +249,7 @@
 			_this.mainElement
 			.transition()
 			.duration(_this.params.durationTime)
-			.attr("height",_this.phases.length*( _this.style.phaseMarginY+_this.style.phaseHeight )+_this.style.phaseY);
+			.attr("height",(_this.phases.length*( _this.style.phaseMarginY+_this.style.phaseHeight )+_this.style.phaseY) + "px");
 		};
 
 		var calcCoordinatesPhasePlanningMode=function(phase) {
@@ -292,7 +292,7 @@
 			phases.enter()
 			.append("rect")
 			.attr("class",function(v,i){return "phase-budget phase-"+v.__id;})
-			.attr("height",_this.style.phaseHeight+"px")
+			.attr("height",_this.style.phaseHeight)
 			.attr("x",timeToCoordinate(5))
 			.attr("y",getY)
 			.attr("width",timeToCoordinate(2));
